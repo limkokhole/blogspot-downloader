@@ -1,0 +1,145 @@
+Below is the quick fix to make python 3 able to run pypub to generate epub, in my quick test it works but may causes bug.
+
+[1]
+Change `from epub import Epub` to `from .epub import Epub` in ~/.local/lib/python3.6/site-packages/pypub/__init__.py
+
+[2]
+Change `import urlparse` to `from urllib.parse import urlparse` in ~/.local/lib/python3.6/site-packages/pypub/chapter.py
+
+[3] 
+import sys, os, pkgutil
+sys.path.append(os.path.dirname(pkgutil.get_loader("pypub").get_filename()))
+, in blogspot-downloader.py or ~/.local/lib/python3.6/site-packages/pypub/__init__.py
+
+[4]
+try:
+  basestring
+except NameError:
+  basestring = str
+, in ~/.local/lib/python3.6/site-packages/pypub/clean.py
+
+[5]
+change `for attribute in attribute_dict.keys():` to `for attribute in list(attribute_dict):`
+, in ~/.local/lib/python3.6/site-packages/pypub/clean.py
+
+[6]
+comment out this part and add this first line:
+unformatted_html_unicode_string = root.prettify(encoding='utf-8', formatter='html')
+#unformatted_html_unicode_string = unicode(root.prettify(encoding='utf-8',
+##                                                        formatter=EntitySubstitution.substitute_html),
+##                                          encoding='utf-8')
+# fix <br> tags since not handled well by default by bs4
+##unformatted_html_unicode_string = unformatted_html_unicode_string.replace('<br>', '<br/>')
+# remove &nbsp; and replace with space since not handled well by certain e-readers
+##unformatted_html_unicode_string = unformatted_html_unicode_string.replace('&nbsp;', ' ')
+return unformatted_html_unicode_string
+, in ~/.local/lib/python3.6/site-packages/pypub/clean.py
+
+[7]
+comment out this:
+#try:
+#    assert isinstance(html_unicode_string, basestring)
+#except AssertionError:
+#    raise TypeError
+, in ~/.local/lib/python3.6/site-packages/pypub/clean.py
+
+[8]
+#unicode_string = unicode(root.prettify(encoding='utf-8', formatter='html'), encoding='utf-8')
+unicode_string = root.prettify(encoding='utf-8', formatter='html')
+, in ~/.local/lib/python3.6/site-packages/pypub/clean.py
+
+[9]
+comment out this:
+    # Close singleton tag_dictionary
+    #for tag in constants.SINGLETON_TAG_LIST:
+    #    unicode_string = unicode_string.replace(
+    #            '<' + tag + '/>',
+    #            '<' + tag + ' />')
+    return unicode_string
+, in ~/.local/lib/python3.6/site-packages/pypub/clean.py
+
+[10]
+comment out this:
+    def _validate_input_types(self, content, title):
+        #try:
+        #    assert isinstance(content, basestring)
+        #except AssertionError:
+        #    raise TypeError('content must be a string')
+        #try:
+        #    assert isinstance(title, basestring)
+        #except AssertionError:
+        #    raise TypeError('title must be a string')
+, in ~/.local/lib/python3.6/site-packages/pypub/chapter.py
+
+[11]
+Add first line and comment out the rest:
+unformatted_html_unicode_string = self._content_tree.prettify(encoding='utf-8', formatter='html')
+#unformatted_html_unicode_string = unicode(self._content_tree.prettify(encoding='utf-8',
+#                                                                      formatter=EntitySubstitution.substitute_html),
+#                                          encoding='utf-8')
+#unformatted_html_unicode_string = unformatted_html_unicode_string.replace('<br>', '<br/>')
+self.content = unformatted_html_unicode_string
+, in ~/.local/lib/python3.6/site-packages/pypub/chapter.py
+
+[12]
+with open(file_name, 'wb') as f:
+    #f.write(self.content.encode('utf-8'))
+    f.write(self.content
+, in ~/.local/lib/python3.6/site-packages/pypub/chapter.py
+
+[13]
+        def read_template():
+            with open(self.template_file, 'r') as f:
+                #template = f.read().decode('utf-8')
+                template = f.read()
+            return jinja2.Template(template)
+, in /home/xiaobai/.local/lib/python3.6/site-packages/pypub/epub.py
+
+[14]
+    for value in lists.values():
+        #assert isinstance(value, list)
+        if list_length is None:
+            list_length = len(value)
+        else:
+            assert len(value) == list_length
+, in /home/xiaobai/.local/lib/python3.6/site-packages/pypub/epub.py
+
+[15]
+def create_zip_archive(epub_name):
+    #try:
+    #    assert isinstance(epub_name, basestring) or epub_name is None
+    #except AssertionError:
+    #    raise TypeError('epub_name must be string or None')
+, in /home/xiaobai/.local/lib/python3.6/site-packages/pypub/epub.py
+
+[16]
+Add `from urllib.parse import urljoin` on top of /home/xiaobai/.local/lib/python3.6/site-packages/pypub/chapter.py
+
+    def _get_image_urls(self):
+        image_nodes = self._content_tree.find_all('img')
+        raw_image_urls = [node['src'] for node in image_nodes if node.has_attr('src')]
+        #full_image_urls = [urlparse.urljoin(self.url, image_url) for image_url in raw_image_urls]
+        full_image_urls = [urljoin(self.url, image_url) for image_url in raw_image_urls]
+
+, in /home/xiaobai/.local/lib/python3.6/site-packages/pypub/chapter.py
+
+[17]
+def get_image_type(url):
+    for ending in ['jpg', 'jpeg', '.gif' '.png']:
+        if url.endswith(ending):
+            return ending
+    else:
+        try:
+            f, temp_file_name = tempfile.mkstemp()
+            urllib.request.urlretrieve
+            #urllib.urlretrieve(url, temp_file_name)
+, in  /home/xiaobai/.local/lib/python3.6/site-packages/pypub/chapter.py
+
+[18]
+                if title_node is not None:
+                    #title = unicode(title_node.string)
+                    title = title_node.string
+, in ~/.local/lib/python3.6/site-packages/pypub/chapter.py
+
+
+
