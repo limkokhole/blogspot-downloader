@@ -19,11 +19,11 @@ The existing online services either need to paid, has limit of files, need to co
 
 ## How to run
 
-    python blogspot_to_pdf_downloader.py [url]
+    python blogspot_downloader.py [url]
 
     OR
 
-    $ python blogspot_to_pdf_downloader.py --help
+    $ python blogspot_downloader.py --help
 
     usage: blogspot_downloader.py [-h] [-a] [-s] [-d] [-p] [-l LOCALE] [-f FEED]                                                                          
                                   [url]                                                                                                                   
