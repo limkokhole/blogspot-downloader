@@ -78,7 +78,7 @@ download blogspot site as web scraping in ePUB including comments:
 
 ![eat](/eat.png?raw=true "download blogspot site as web scraping in ePUB")
 
-download blogspot site as rss feed in ePUB, plus custom locale:  
+download blogspot site as rss feed in ePUB, plus custom locale date in Chinese:  
 
 ![locale](/locale.png?raw=true "download blogspot site as rss feed in ePUB, plus custom locale")
 
