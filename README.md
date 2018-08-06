@@ -74,7 +74,7 @@ download blogspot site as rss feed in pdf without file limits:
 
 ![google](/google.png?raw=true "download blogspot site as rss feed in pdf without file limits")  
 
-download blogspot site as web scraping in ePUB:
+download blogspot site as web scraping in ePUB including comments:
 
 ![eat](/eat.png?raw=true "download blogspot site as web scraping in ePUB")
 
