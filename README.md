@@ -7,7 +7,7 @@ This python script download all posts from blogspot and convert into epub or pdf
 The existing online services either need to paid, has limit of files, need to copy per-page manually, only support rss feed, or only support epub. This python script is free, no files limit as it run in your local machine/ip, download all pages/feed automatically, support both rss and web scraping(some blog rss is private or only one page), support both epub and pdf. It also support custom locale date. The most important thing: this is simple python code and you can feel free to modify it, e.g. custom html color, extra html header/footer, default directory ... etc :)
 
 ## How to setup
-    git clone https://github.com/limkokhole/blogspot-to-pdf-downloader.git
+    git clone https://github.com/limkokhole/blogspot-downloader.git
 
     pip2 install -r requirements_py2.txt #python 2
 
