@@ -68,8 +68,8 @@ To make pypub works in python 3, read how_to_make_epub_work_in_python3.guide to 
 
     def get_image_type(url):
         url = url.lower() #[1] add this
-        for ending in ['jpg', 'jpeg', '.gif', '.png']: #[2] add comma between .gif and .png !!!
-             if url.endswith(ending) or (ending + '?') in url: #[3] add (ending + '?') checking or esle not showing image end with ? wichh contains inner html img src, and the imghdr will not recognize it but ePUB editor and web browser able to render it.
+        for ending in ['jpg', 'jpeg', '.gif', '.png']: #[2] add comma between .gif and .png
+             if url.endswith(ending)  or ((ending + '?') in url): #[3] add (ending + '?') checking or esle not showing image end with ? wichh contains inner html img src, and the imghdr will not recognize it but ePUB editor and web browser able to render it.
                 return ending
         else:
             try:
