@@ -123,17 +123,21 @@ Add `from urllib.parse import urljoin` on top of ~/.local/lib/python3.6/site-pac
 
 , in ~/.local/lib/python3.6/site-packages/pypub/chapter.py
 
-[17]
+[17] 
 def get_image_type(url):
-    for ending in ['jpg', 'jpeg', '.gif' '.png']:
+    url = url.lower() #add this
+    for ending in ['jpg', 'jpeg', '.gif', '.png']: #add command between .gif and .png !!!
         if url.endswith(ending):
             return ending
     else:
         try:
             f, temp_file_name = tempfile.mkstemp()
-            urllib.request.urlretrieve(url, temp_file_name)
-            #urllib.urlretrieve(url, temp_file_name)
+            urllib.request.urlretrieve(url, temp_file_name) #add this 
+            #urllib.urlretrieve(url, temp_file_name) #comment out this
 , in  ~/.local/lib/python3.6/site-packages/pypub/chapter.py
+
+
+
 
 [18]
                 if title_node is not None:

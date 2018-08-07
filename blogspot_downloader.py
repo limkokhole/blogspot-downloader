@@ -339,13 +339,18 @@ def download(url, h, d_name, ext):
                         my_chapter = pypub.create_chapter_from_url(title=title_raw, url=t_url)
                     else: #no choice like that and better not set with t_url, use other editor if kchmviewer error, should unlikely happen though
                         my_chapter = pypub.create_chapter_from_url(t_url)
-                    my_chapter.content = replacer(my_chapter.content)
+                    #print(my_chapter.content)
+                    #my_chapter.content = replacer(my_chapter.content)
                     my_chapter.title = replacer(my_chapter.title)
                     #sigil viewer will warning and auto convert for you, e.g. /<img> become </>, replace <!DOCTYPE html> to <?xml version="1.0" encoding="utf-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">, Add  <title></title> ...etc, this isnormal and shouldn't have extra work to do, while kchmviewer able to render it without error.
-                    try:
-                        my_chapter.content = my_chapter.content.decode('utf-8')
-                    except:
-                        pass #print("decode content err")
+                    #try:
+                    #    my_chapter.content = my_chapter.content.decode('utf-8')
+                    #except:
+                    #    pass #print("decode content err")
+                    #
+                    # The correct way to replace, you can't direct `my_chapter.content = 'xxx'` and expect it take effect !
+                    #my_chapter._content_tree = BeautifulSoup(my_chapter.content, 'html.parser')
+
                     try:
                         my_chapter.title = my_chapter.title.decode('utf-8')
                     except: #-a http://cuhkt48.blogspot.com/2016/07/blog-post.html
@@ -358,6 +363,7 @@ def download(url, h, d_name, ext):
                         my_chapter = pypub.create_chapter_from_string(h, title='/'.join(title.split('/')[-3:]), url=t_url)
                     #print(my_chapter.content)
                     #my_chapter = pypub.create_chapter_from_string(r['entries'][0]['summary'].replace('<div class="separator"', '<div class="separator" align="center" '))
+                
                 my_epub.add_chapter(my_chapter)
                 my_epub.create_epub(os.getcwd())
                 rm_tmp_files()
@@ -462,7 +468,7 @@ def main():
 if sys.version_info[0] < 3:
     sys.exc_clear() #do not produce eception of import part.
 if __name__ == "__main__":
-    parser.add_argument('-a', '--all', action='store_true', help='Display website mode instead of rss feed mode. Only support blogspot website but you can try yuor luck in other site too')
+    parser.add_argument('-a', '--all', action='store_true', help='Display website mode instead of rss feed mode. Only support blogspot website but you can try your luck in other site too')
     parser.add_argument('-s', '--single', action='store_true', help='Download based on provided url year/month instead of entire blog, will ignored in rss feed mode and --print_date')
     parser.add_argument('-d', '--print_date', action='store_true', help='Print main date info without execute anything')
     parser.add_argument('-p', '--pdf', action='store_true', help='Output in PDF instead of EPUB but might failed in some layout')
