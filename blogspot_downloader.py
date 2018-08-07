@@ -45,11 +45,14 @@ if sys.version_info[0] >= 3:
     import urllib.request
     def unicode(mystr): #python3
         return mystr
+    import html
 else:
     from urllib2 import urlopen, HTTPError
     import urllib2
     from urlparse import urlparse
     input = raw_input
+    from HTMLParser import HTMLParser
+    html_parser = HTMLParser() #again, don't conflict name with other vars "parser"
 try: from bs4 import BeautifulSoup, SoupStrainer #python3 #python2 also got, and python need use this or else error when `soup = BeautifulSoup(r, "lxml")` 
 except ImportError: from BeautifulSoup import BeautifulSoup, SoupStrainer #python2
 #import weasyprint #incomplete, so don't use
@@ -77,9 +80,14 @@ if sys.version_info[0] >= 3:
     r1 = '’'; r2 = "“"; r3 = "”"; r4 = '—'; r5 = '–'; r6 = '…'; r7 = '®'
 else:
     r1 = '’'.decode('utf-8'); r2 = "“".decode('utf-8'); r3 = "”".decode('utf-8'); r4 = '—'.decode('utf-8'); r5 = '–'.decode('utf-8'); r6 = '…'.decode('utf-8'); r7 = '®'.decode('utf-8')
-#import cgi #cgi.escape
+import cgi #cgi.escape
 def replacer(s):
-    return s.replace('\\x26', "&").replace(r1, "'").replace(r2, '"').replace(r3, '"').replace(r4, '--').replace(r5, '-').replace(r6, '...').replace(r7, '(R)').replace('& ', '&amp;') #put \x26 first, and \x26amp; and \x26#39; means & and ' respectively
+    s = s.replace('\\x26', "&")
+    if sys.version_info[0] >= 3:
+        s = html.unescape(s)
+    else:
+        s = html_parser.unescape(s)
+    return s.replace(r1, "'").replace(r2, '"').replace(r3, '"').replace(r4, '--').replace(r5, '-').replace(r6, '...').replace(r7, '(R)').replace('& ', '&amp;') #put \x26 first, and \x26amp; and \x26#39; means & and ' respectively
 
 temp_dir_ext=".blogspot-downloader.temp"
 import tempfile
@@ -235,6 +243,9 @@ def download(url, h, d_name, ext):
                 if args.pdf: #just now got 1 post shows blank but got div in feed, then noticed it's white color font, lol
                     h = '<head><meta charset="UTF-8"></head><body>' + h + tt['summary'].replace('<div class="separator"', '<div class="separator" align="center" ') + '</body>'
                 else: #epub can't set body/head
+                    #h_soup = BeautifulSoup(tt['summary'], "lxml")
+                    #for pre in h_soup.find_all('pre'):
+                    #    print("pre: ", pre)
                     h = h + tt['summary'].replace('<div class="separator"', '<div class="separator" align="center" ')
                 title = tt['title']
                 t_url = visit_link
@@ -340,8 +351,9 @@ def download(url, h, d_name, ext):
                     except: #-a http://cuhkt48.blogspot.com/2016/07/blog-post.html
                         pass #print("decode title err")
                 else:
-                    h = replacer(h)
+                    #h = replacer(h) #'https://www.blogger.com/feeds/1176949257541686127/posts/default?start-index=251&max-results=25' -> https://security.googleblog.com/2009/03/reducing-xss-by-way-of-automatic.html got <prev> and body, so don't blindly unescape all #might need filter by pre and allow other to replace, need to test more to know got error or not without replace
                     if title_raw:
+                        #print(h)
                         my_chapter = pypub.create_chapter_from_string(h, title=title_raw, url=t_url)
                     else:
                         my_chapter = pypub.create_chapter_from_string(h, title='/'.join(title.split('/')[-3:]), url=t_url)
