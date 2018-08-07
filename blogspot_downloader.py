@@ -317,6 +317,10 @@ def download(url, h, d_name, ext):
                         title = title.decode('utf-8')
                     except:
                         pass
+                    try: #fixed -as http://miniechung1998.blogspot.com/2012/12/xd-xd.html
+                        title_raw = title_raw.decode('utf-8')
+                    except:
+                        pass
                     title_raw = replacer(title_raw).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;') #unlike content, title can replace '&'(no space) like that since & may no space
                     #, if content do like that will got no image, got visible &nbsp; text ...etc
                 if args.all:
