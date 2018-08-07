@@ -86,7 +86,7 @@ import tempfile
 sys_tmp_dir = tempfile.gettempdir()
 def rm_tmp_files():
     #this is simply remove tmp trash files in /tmp/, and also need clean_up() to remove custom temp dir(set in epub_dir when invoke pypub.Epub(fname, epub_dir=fname+temp_dir_ext) or else pypub module use tempfile.mkdtemp() which doesn't clean up unless reboot), and /tmp/ might got limit also.
-    #Note that the error "Too many open files" has nothing to do with temp files, which the actualy fix is resource.setrlimit. (`ulimit -n` to know your current open file soft limit)
+    #Note that the error "Too many open files" will not able to fix even you removed temp files, which the actual fix is resource.setrlimit. (`ulimit -n` to know your current open file soft limit)
     #note that it should only remove after create_epub() and don't remove directory or else need re-init pypub.Epub() and add_chapter from scratch
     for root, dirs, files in os.walk(sys_tmp_dir):
         for fname in files:
@@ -469,8 +469,9 @@ if __name__ == "__main__":
             clean_up()
     finally: #https://stackoverflow.com/questions/4606942/why-cant-i-handle-a-keyboardinterrupt-in-python
         #traceback.print_exc() #finally doesn't always means exception, it will run even in normal flow, so no need clean_up in other place
-        #f = open(os.devnull, 'w') #don't print anthing for traceback.print_exc
-        #sys.stdout = f
+        if sys.version_info[0] >= 3: #temp workaround to suppress none
+            f = open(os.devnull, 'w') #don't print anthing for traceback.print_exc
+            sys.stdout = f
         if traceback.format_exc() != 'None\n':
             print(traceback.format_exc())
             print("Exception -1")
