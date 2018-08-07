@@ -150,7 +150,7 @@ def get_image_type(url):
     def get_image_type(url):
         url = url.lower() #add this
         for ending in ['jpg', 'jpeg', '.gif', '.png']: #add missing comma between '.gif' and '.png'
-            if url.endswith(ending) or ((ending + '?') in url): #add (ending + '?') checking or esle not showing image end with ? wichh contains inner html img src, and the imghdr will not recognize it but ePUB editor and web browser able to render it.
+            if url.endswith(ending) or ((ending + '?') in url): #add (ending + '?') checking or else not showing image end with ? wichh contains inner html img src, and the imghdr will not recognize it but ePUB editor and web browser able to render it.
                 return ending 
 , in ~/.local/lib/python3.6/site-packages/pypub/chapter.py
 
