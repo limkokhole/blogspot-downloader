@@ -353,7 +353,6 @@ def download(url, h, d_name, ext):
                 else:
                     #h = replacer(h) #'https://www.blogger.com/feeds/1176949257541686127/posts/default?start-index=251&max-results=25' -> https://security.googleblog.com/2009/03/reducing-xss-by-way-of-automatic.html got <prev> and body, so don't blindly unescape all #might need filter by pre and allow other to replace, need to test more to know got error or not without replace
                     if title_raw:
-                        #print(h)
                         my_chapter = pypub.create_chapter_from_string(h, title=title_raw, url=t_url)
                     else:
                         my_chapter = pypub.create_chapter_from_string(h, title='/'.join(title.split('/')[-3:]), url=t_url)
