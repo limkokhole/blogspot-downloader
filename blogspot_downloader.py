@@ -363,7 +363,6 @@ def download(url, h, d_name, ext):
                         my_chapter = pypub.create_chapter_from_string(h, title='/'.join(title.split('/')[-3:]), url=t_url)
                     #print(my_chapter.content)
                     #my_chapter = pypub.create_chapter_from_string(r['entries'][0]['summary'].replace('<div class="separator"', '<div class="separator" align="center" '))
-                
                 my_epub.add_chapter(my_chapter)
                 my_epub.create_epub(os.getcwd())
                 rm_tmp_files()
