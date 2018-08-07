@@ -469,8 +469,8 @@ if __name__ == "__main__":
             clean_up()
     finally: #https://stackoverflow.com/questions/4606942/why-cant-i-handle-a-keyboardinterrupt-in-python
         #traceback.print_exc() #finally doesn't always means exception, it will run even in normal flow, so no need clean_up in other place
-        f = open(os.devnull, 'w') #don't print anthing for traceback.print_exc
-        sys.stdout = f
+        #f = open(os.devnull, 'w') #don't print anthing for traceback.print_exc
+        #sys.stdout = f
         if traceback.format_exc() != 'None\n':
             print(traceback.format_exc())
             print("Exception -1")
