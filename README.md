@@ -64,12 +64,12 @@ This script designate in Linux and never test in Windows. This script also not d
 
 To make pypub works in python 3, read how_to_make_epub_work_in_python3.guide to change it manually yourself, or simply fork the module from https://github.com/limkokhole/pypub .
 
-## Important fix in .../pypub/chapter.py, in both python 2/3:
+## To fix missing image in ePUB, you should fix the following 3 bugs manually in pypub_module_path/pypub/chapter.py, in both python 2/3 (use `import pypub; print(locals())` to located the module path):
 
     def get_image_type(url):
-        url = url.lower() #add this
-        for ending in ['jpg', 'jpeg', '.gif', '.png']: #add comma between .gif and .png !!!
-            if url.endswith(ending):
+        url = url.lower() #[1] add this
+        for ending in ['jpg', 'jpeg', '.gif', '.png']: #[2] add comma between .gif and .png !!!
+             if url.endswith(ending) or (ending + '?') in url: #[3] add (ending + '?') checking or esle not showing image end with ? wichh contains inner html img src, and the imghdr will not recognize it but ePUB editor and web browser able to render it.
                 return ending
         else:
             try:
@@ -79,7 +79,7 @@ To make pypub works in python 3, read how_to_make_epub_work_in_python3.guide to 
 
 Duplicated filename will not replace but suffix with current timestamp.
 
-ePUB file can edit manually. Simply change name to .zip, unzip it, edit the xhtml, and (inside epub directory) do `zip -rX ../<epub direcory name>.epub minetype.txt META-INF/ OEBPS/` to repack it easily.  I recommend Kchmviewer viewer and Sigli, but if it doesn't open since it may too strict in xhtml syntax, then you can try other viewer in this case (Sigli will try auto fix for you), and please don't feel hesitate to open a issue ticket.  
+ePUB file can edit manually. Simply change name to .zip, unzip it, edit the xhtml, and (inside epub directory) do `zip -rX ../<epub direcory name>.epub minetype.txt META-INF/ OEBPS/` to repack it easily.  I recommend Kchmviewer viewer and Sigli, but if it doesn't open since it may too strict in xhtml syntax, then you can try other viewer in this case (Sigli will try auto fix for you), and please don't feel hesitate to issue a ticket.  
 
 download non-blogspot site as rss feed in pdf:  
 
