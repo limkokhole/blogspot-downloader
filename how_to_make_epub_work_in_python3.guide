@@ -131,7 +131,7 @@ def get_image_type(url):
     else:
         try:
             f, temp_file_name = tempfile.mkstemp()
-            urllib.request.urlretrieve
+            urllib.request.urlretrieve(url, temp_file_name)
             #urllib.urlretrieve(url, temp_file_name)
 , in  /home/xiaobai/.local/lib/python3.6/site-packages/pypub/chapter.py
 
