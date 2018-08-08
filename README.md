@@ -64,7 +64,7 @@ This script designate in Linux and never test in Windows. This script also not d
 
 To make pypub works in python 3, read how_to_make_epub_work_in_python3.guide to change it manually yourself, or simply fork the module from https://github.com/limkokhole/pypub .
 
-### To fix missing image in ePUB, you should fix the following 3 bugs manually in pypub_module_path/pypub/chapter.py, in both python 2/3 (use `import pypub; print(locals())` to located the module path):
+#### To fix missing image in ePUB, you should fix the following 3 bugs manually in pypub_module_path/pypub/chapter.py, in both python 2/3 (use `import pypub; print(locals())` to located the module path):
 
     def get_image_type(url):
         url = url.lower() #[1] add this
@@ -75,6 +75,12 @@ To make pypub works in python 3, read how_to_make_epub_work_in_python3.guide to 
             try:
                 f, temp_file_name = tempfile.mkstemp()
                 ...
+
+#### To fix missing sample code in ePUB, you should add this 2 tags manually in pypub_module_path/pypub/constants.py:
+
+ 'code': [],
+ ...
+ 'pre': [],
 
 
 Duplicated filename will not replace but suffix with current timestamp.

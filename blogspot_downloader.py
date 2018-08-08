@@ -211,7 +211,7 @@ def download(url, h, d_name, ext):
                         url = ''
                 else:
                     url = ''
-            elif not t: #no need care if next page rss index suddently change and no content case
+            elif not t: #no need care if next page rss index suddenly change and no content case
                 url = ''
                 print_rss_err()
         count = 0
@@ -342,7 +342,7 @@ def download(url, h, d_name, ext):
                     #print(my_chapter.content)
                     #my_chapter.content = replacer(my_chapter.content)
                     my_chapter.title = replacer(my_chapter.title)
-                    #sigil viewer will warning and auto convert for you, e.g. /<img> become </>, replace <!DOCTYPE html> to <?xml version="1.0" encoding="utf-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">, Add  <title></title> ...etc, this isnormal and shouldn't have extra work to do, while kchmviewer able to render it without error.
+                    #sigil viewer will warning and auto convert for you, e.g. /<img> become </>, replace <!DOCTYPE html> to <?xml version="1.0" encoding="utf-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">, Add  <title></title> ...etc, this is normal and shouldn't have extra work to do, while kchmviewer able to render it without error.
                     #try:
                     #    my_chapter.content = my_chapter.content.decode('utf-8')
                     #except:
@@ -390,7 +390,7 @@ def scrape(url, d_name, ext):
         data = soup.findAll('li',attrs={'class':'archivedate'})
     year_l = []
     if len(data) == 0:
-        print('\nNo data found. You may check your url OR try -f <rss feed url> instead. Also do not use -a if -f added.\n')
+        print('\nNo data found. You may check your url OR try -f <rss feed url> OR remove -a instead. Also do not use -a if -f added.\n')
         os._exit(1)
     for div in data:
         if case == 0:

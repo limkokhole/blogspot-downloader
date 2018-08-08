@@ -155,3 +155,10 @@ def get_image_type(url):
 , in ~/.local/lib/python3.6/site-packages/pypub/chapter.py
 
 
+[20] #To fix missing sample code in ePUB, you should add this 2 tags manually in pypub_module_path/pypub/constants.py:
+
+ 'code': [],
+ ...
+ 'pre': [],
+
+
