@@ -78,14 +78,16 @@ To make pypub works in python 3, read how_to_make_epub_work_in_python3.guide to 
 
 #### To fix missing sample code in ePUB, you should add this 2 tags manually in pypub_module_path/pypub/constants.py:
 
- 'code': [],
- ...
- 'pre': [],
+    'code': [],
+    ...
+    'pre': [],
 
 
 Duplicated filename will not replace but suffix with current timestamp.
 
 ePUB file can edit manually. Simply change name to .zip, unzip it, edit the xhtml, and (inside epub directory) do `zip -rX ../<epub direcory name>.epub minetype.txt META-INF/ OEBPS/` to repack it easily.  I recommend Kchmviewer viewer and Sigli, but if it doesn't open since it may too strict in xhtml syntax, then you can try other viewer in this case (Sigli will try auto fix for you), and please don't feel hesitate to issue a ticket.  
+
+## Sample Screenshots:
 
 download non-blogspot site as rss feed in pdf:  
 
