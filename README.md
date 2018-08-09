@@ -82,11 +82,12 @@ ePUB file can edit manually. Simply change name to .zip, unzip it, edit the xhtm
                 f, temp_file_name = tempfile.mkstemp()
                 ...
 
-#### To fix missing sample code in ePUB, you should add this 2 tags manually in pypub_module_path/pypub/constants.py:
+#### To fix missing sample code in ePUB, you should add this 2 tags manually in pypub_module_path/pypub/constants.py (Test case: https://security.googleblog.com/2009/03/reducing-xss-by-way-of-automatic.html):
 
-    'code': [],
-    ...
-    'pre': [],
+    SUPPORTED_TAGS = {
+        'code': [],
+        ...
+        'pre': [],
 
 ## Sample Screenshots:
 
