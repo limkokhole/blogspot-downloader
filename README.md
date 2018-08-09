@@ -1,6 +1,6 @@
 # blogspot downloader
 
-This python script download all posts from blogspot and convert into epub or pdf. 
+This python script download all posts from blogspot and convert into epub or pdf. Not only blogspot, if that webpage contains rss feed, such as wordpress, then it able to download too. And I already make it able to download wordpress rss correctly.
 
 ## Why ?
 
@@ -82,12 +82,14 @@ ePUB file can edit manually. Simply change name to .zip, unzip it, edit the xhtm
                 f, temp_file_name = tempfile.mkstemp()
                 ...
 
-#### To fix missing sample code in ePUB, you should add this 2 tags manually in pypub_module_path/pypub/constants.py (Test case: https://security.googleblog.com/2009/03/reducing-xss-by-way-of-automatic.html):
+#### To fix missing sample code in ePUB, you should add this 2 tags manually in pypub_module_path/pypub/constants.py (Test case: https://security.googleblog.com/2009/03/reducing-xss-by-way-of-automatic.html), and also add "style" tag to make custom image padding 5px (in code) works:
 
     SUPPORTED_TAGS = {
         'code': [],
         ...
         'pre': [],
+        ...
+        'style': ['display', 'padding', 'max-height', 'max-width'], 
 
 ## Sample Screenshots:
 

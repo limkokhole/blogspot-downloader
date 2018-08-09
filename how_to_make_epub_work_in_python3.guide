@@ -155,10 +155,13 @@ def get_image_type(url):
 , in ~/.local/lib/python3.6/site-packages/pypub/chapter.py
 
 
-[20] #To fix missing sample code in ePUB, you should add this 2 tags manually in pypub_module_path/pypub/constants.py:
+[20] #To fix missing sample code in ePUB, you should add this 2 tags manually in pypub_module_path/pypub/constants.py (Test case: https://security.googleblog.com/2009/03/reducing-xss-by-way-of-automatic.html), and also add "style" tag to make custom image padding 5px (in code) works:
 
- 'code': [],
- ...
- 'pre': [],
+    SUPPORTED_TAGS = {
+        'code': [],
+        ...
+        'pre': [],
+        ...
+        'style': ['display', 'padding', 'max-height', 'max-width'], 
 
 
