@@ -282,7 +282,8 @@ def download(url, h, d_name, ext):
                         for tm in tt['media_content']:
                            #pitfall: python 3 dict no has_key() attr
                             if ('medium' in tm) and (tm['medium'] == 'image') and 'url' in tm:
-                                media_content += '<img style="display: block; max-height: 100%; max-width: 100%" src="' + tm['url'] + '" >'
+                                media_content += '<img src="' + tm['url'] + '" >'
+                                #media_content += '<img style="display: block; max-height: 100%; max-width: 100%" src="' + tm['url'] + '" >'
                 except Exception as e:
                     print(e)
                     print('parse media content error')
