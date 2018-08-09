@@ -1,6 +1,8 @@
 # blogspot downloader
 
-This python script download all posts from blogspot and convert into epub or pdf. Not only blogspot, if that webpage contains rss feed, such as wordpress, then it able to download too. And I already make it able to download wordpress rss correctly.
+This python script download all posts from blogspot and convert into epub or pdf, either in web page looks or rss feed looks.
+
+Not only blogspot, if any webpage contains rss feed, especially for wordpress, then it able to download in rss mode.
 
 ## Why ?
 
