@@ -89,7 +89,7 @@ def replacer(s):
         s = html_parser.unescape(s)
     return s.replace(r1, "'").replace(r2, '"').replace(r3, '"').replace(r4, '--').replace(r5, '-').replace(r6, '...').replace(r7, '(R)').replace('& ', '&amp;') #put \x26 first, and \x26amp; and \x26#39; means & and ' respectively
 
-temp_dir_ext=".blogspot-downloader.temp"
+temp_dir_ext = ".blogspot-downloader.temp"
 import tempfile
 sys_tmp_dir = tempfile.gettempdir()
 def rm_tmp_files():
@@ -109,9 +109,9 @@ soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
 #print('You might hit sort limit of open files ', soft, ", now try to change soft to hard limit: ", hard)
 resource.setrlimit(resource.RLIMIT_NOFILE, (hard, hard))
 
-UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36'
+UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36'
 
-def get_locale_abbrev(s):
+def parse_locale(s):
     try:
         with setlocale(locale.LC_TIME, args.locale):
             return date_parser.parse(s).strftime('%B %d, %Y, %H:%M %p')
@@ -129,7 +129,7 @@ def process_rss_link(url):
             url+='&paged=1'
     elif 'start-index=' not in url:
         url+='&start-index=1&max-results=25'
-    return url.replace('&alt=rss', '').replace('?alt=rss', '?') #to prevent no next rss page link
+    return url.replace('&alt=rss', '').replace('?alt=rss', '?').replace('?&', '?') #to prevent no next rss page link
 
 
 def print_rss_err():
@@ -138,6 +138,16 @@ def print_rss_err():
 #prevent image too big and need to scroll
 #only epub, don't put it in pdf, it will causes image not appear
 img_css_style='<style>img { display: block; padding: 5px; max-height: 100%; max-width: 100%;}</style>' 
+
+def import_pypub():
+    global pypub
+    try:
+        import pypub #for epub
+    except ImportError:
+        traceback.print_exc()
+        print("\ncurrently epub not support in python 3, please run as python2 OR supply -p option to download as pdf\n")
+        clean_up()
+        sys.exit(-1)
 
 epub_dir = ""
 download_once = False #if want support interactive, then need to changed this logic
@@ -149,13 +159,7 @@ def download(url, h, d_name, ext):
         global my_epub
         global epub_dir
         if not args.pdf:
-            try:
-                import pypub #for epub
-            except ImportError:
-                traceback.print_exc()
-                print("\ncurrently epub not support in python 3, please run as python2 OR supply -p option to download as pdf\n")
-                clean_up()
-                sys.exit(-1)
+            import_pypub()
 
         #e.g. 'https://diannaoxiaobai.blogspot.com/?action=getTitles&widgetId=BlogArchive1&widgetType=BlogArchive&responseType=js&path=https://diannaoxiaobai.blogspot.com/2018/'
         visit_link = url
@@ -179,7 +183,6 @@ def download(url, h, d_name, ext):
             r = feedparser.parse(url) #, request_headers={'User-Agent': UA, 'Referer': url}) #I noticed https://blog.mozilla.org/security/feed/1 (/1 non exist) is working in feedparser, lolr
             #print(r.headers)
             t = r['entries']
-
             #if (not t) or ("link" not in r['feed'].keys()): #if got entries then whe need retry ? no need check link
             if (not init_url_once) and (not t): #'User does not have permission to read this blog.' of rss feed come here
                 init_url_once = True
@@ -201,6 +204,10 @@ def download(url, h, d_name, ext):
                     os._exit(1) #don't use sys.exit(-1) if don't want to traceback to main() to print exception
                 soup = BeautifulSoup(r, "lxml")
                 data = soup.findAll('link', attrs={'type':'application/rss+xml'})
+                if not data: #https://github.com/RSS-Bridge/rss-bridge/issues/566 only has atom
+                    data = soup.findAll('link', attrs={'type':'application/atom+xml'})
+                if not data: 
+                    data = soup.findAll('a', attrs={'href':'/rss/'}) #https://blog.google/products/
                 if data:
                     url = data[0].get("href")
                     url = process_rss_link(url)
@@ -217,28 +224,31 @@ def download(url, h, d_name, ext):
             else: #unlike blogspot, wordpress always got t, so need set true here
                 init_url_once = True
             parsed_url = urlparse(url)
-
             is_wordpress = '{uri.netloc}'.format(uri=parsed_url).endswith('wordpress.com')
             if not is_wordpress: #only check next if 1st check is False, or lese 2nd check override 1st result
                 try:
-                    is_wordpress = r.get('feed', {}).get('generator', {}).startswith('https://wordpress.org/')
-                except Exception:
-                    print('parse generator error')
+                    if 'keys' in dir(r):
+                        is_wordpress = r.get('feed', {}).get('generator', '').startswith('https://wordpress.org/')
+                except Exception as e:
+                    print('parse generator error', e)
             if is_wordpress and t: #increment paged only if current page got entries, i.e. t
                 #parsed_keys = urlparse.parse.parse_qs(parsed_url.query) #my python 2 don't have parse_qs
                 if 'paged=' in parsed_url.query:
                     wp_paged_v = int(parsed_url.query[parsed_url.query.rindex('paged=') + len('paged='):])
                     #uri.path default prefix with '/' if not empty, so don't set '/' after netloc or else keep increase '////...' in each page
-                    url = '{uri.scheme}://{uri.netloc}{uri.path}?'.format(uri=parsed_url) + parsed_url.query.replace('paged=' + str(wp_paged_v), 'paged=' + str(wp_paged_v+1)) 
-
+                    url = '{uri.scheme}://{uri.netloc}{uri.path}?'.format(uri=parsed_url) + parsed_url.query.replace('paged=' + str(wp_paged_v), 'paged=' + str(wp_paged_v+1))
+                else:
+                    url = ''
+                    print('no next') 
             elif ("keys" in dir(r)) and ('link' in r['feed'].keys()):
                 l = r['feed']['links']
                 if l:
                     got_next = False
                     for ll in l:
                         if ll['rel'] == 'next':
-                            got_next = True
+                            #if ll['href'] != url: #don't have next link is same case to test
                             url = ll['href']
+                            got_next = True
                             break;
                     if not got_next:
                         url = ''
@@ -256,13 +266,19 @@ def download(url, h, d_name, ext):
             if not args.all:
                 #e.g. parser.parse('2012-12-22T08:36:46.043-08:00').strftime('%B %d, %Y, %H:%M %p')
                 h = ''
-                if args.locale:
-                    if sys.version_info[0] >= 3:
-                        t_date = get_locale_abbrev(tt['published'])
+                #https://github.com/RSS-Bridge/rss-bridge/commits/master.atom only has 'updated'
+                post_date = tt.get('published', tt.get('updated', ''))
+                t_date = ''
+                try:
+                    if args.locale:
+                        if sys.version_info[0] >= 3:
+                            t_date = parse_locale(post_date)
+                        else:
+                            t_date = parse_locale(post_date).decode('utf-8')
                     else:
-                        t_date = get_locale_abbrev(tt['published']).decode('utf-8')
-                else:
-                    t_date = date_parser.parse(tt['published']).strftime('%B %d, %Y, %H:%M %p')
+                        t_date = date_parser.parse(post_date).strftime('%B %d, %Y, %H:%M %p')
+                except ValueError: #Unknown string format, e.g. https://www.xul.fr/en-xml-rss.html got random date format such as 'Wed, 29 Jul 09 15:56:54  0200'
+                    t_date = post_date
                 for feed_links in tt['links']:
                     if feed_links['rel'] == 'alternate':
                         visit_link = feed_links['href']
@@ -273,20 +289,29 @@ def download(url, h, d_name, ext):
                     title_is_link = True
                 if args.pdf: #pdf with img css causes image not appear at all
                     img_css_style = ''
-                h = '<div><small>' + tt['author_detail']['name'] + ' ' +  t_date + '<br/><i>' + title_pad + '<a style="text-decoration:none;color:black" href="' + visit_link + '">' + tt['title'] + '</a></i></small><br/><br/></div>' + img_css_style
+
+                author = tt.get('author_detail', {}).get('name')
+                if not author:
+                    author = tt.get('site_name', '') #https://blog.google/rss/
+
+                h = '<div><small>' + author + ' ' +  t_date + '<br/><i>' + title_pad + '<a style="text-decoration:none;color:black" href="' + visit_link + '">' + tt['title'] + '</a></i></small><br/><br/></div>' + img_css_style
                 #<hr style="border-top: 1px solid #000000; background: transparent;">
 
                 media_content = ''
                 try:
-                    if ('media_content' in tt): #wordpress got list of images with link, e.g. darrentcy.wordpress.com
+                    if 'media_content' in tt: #wordpress/blog.google got list of images with link, e.g. darrentcy.wordpress.com
                         for tm in tt['media_content']:
                            #pitfall: python 3 dict no has_key() attr
                             if ('medium' in tm) and (tm['medium'] == 'image') and 'url' in tm:
                                 media_content += '<img src="' + tm['url'] + '" >'
                                 #media_content += '<img style="display: block; max-height: 100%; max-width: 100%" src="' + tm['url'] + '" >'
+                    elif 'media_thumbnail' in tt: #https://gigaom.com/feed/ only has thumbnail
+                        for tm in tt['media_thumbnail']:
+                            if 'url' in tm:
+                                media_content += '<img src="' + tm['url'] + '" >'
                 except Exception as e:
                     print(e)
-                    print('parse media content error')
+                    print('parse media error')
 
                 #pdfkit need specific charset, epub seems no need
                 if args.pdf: #just now got 1 post shows blank but got div in feed, then noticed it's white color font, lol
@@ -310,9 +335,9 @@ def download(url, h, d_name, ext):
             print('\ntitle: ' + title_raw)
             print('link: ' + t_url)
             if args.pdf:
-                print('Download html as PDF, please be patient...' + str(count) + '/' + str(len(t)-1))
+                print('Download html as PDF, please be patient...' + str(count) + '/' + str(len(t)))
             else:
-                print('Download html as EPUB, please be patient...' + str(count) + '/' + str(len(t)-1))
+                print('Download html as EPUB, please be patient...' + str(count) + '/' + str(len(t)))
             if args.pdf:
                 if title_is_link: #else just leave slash with empty
                     title = '/'.join(title.split('/')[-3:])
@@ -479,10 +504,11 @@ def clean_up():
         sys.exit(-1)
 
 def main():
+        global epub_dir
         if args.url:
             url = args.url
         else:
-            url = input('Blogspot URL: ').strip()
+            url = input('URL: ').strip()
         if (url.startswith("'") and url.endswith("'")) or (url.startswith('"') and url.endswith('"')):
             url = url[1:-1]
         if not url.startswith(('http://', 'https://')):
@@ -501,6 +527,42 @@ def main():
         if args.print_date:
             print('Debugging\n')
             scrape(url, d_name, ext)
+        elif args.one:
+            d_name = d_name.strip()
+            if args.pdf:
+                fname = d_name + ext
+            else: #.epub will auto suffix
+                fname = d_name + ext
+            fpath = os.path.join(os.getcwd(), fname)
+            while os.path.exists(fpath):
+                 fname = d_name + '_' + str(int(time.time())) + ext
+                 fpath = os.path.join(os.getcwd(), fname )
+            try:
+                if args.pdf:
+                    print('Create single pdf: ' + fpath)
+                    pdfkit.from_url(url, fpath)
+                else:
+                    import_pypub()
+                    tmp_dir = d_name+temp_dir_ext
+                    my_epub = pypub.Epub(fname[:-5], epub_dir=tmp_dir)
+                    print('Create single epub: ' + fpath)
+                    while True: 
+                        print('Trying url: ' + url)
+                        epub_dir = os.path.join( os.getcwd(), tmp_dir )
+                        my_chapter = pypub.create_chapter_from_url(url)
+                        my_epub.add_chapter(my_chapter)
+                        my_epub.create_epub(os.getcwd())
+                        reply = input('Paste next <url> OR type \'n\' to exit: ').strip()
+                        if (reply and reply[0].lower() != 'n'):
+                            url = reply
+                            if (url.startswith("'") and url.endswith("'")) or (url.startswith('"') and url.endswith('"')):
+                                url = url[1:-1]
+                            if not url.startswith(('http://', 'https://')):
+                                url = 'https://' + url
+                        else:
+                            break
+            except IOError as ioe:
+                print("IOError", ioe)
         elif not args.all:
             print('Download in rss feed mode')
             if args.feed:
@@ -526,6 +588,7 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--pdf', action='store_true', help='Output in PDF instead of EPUB but might failed in some layout')
     parser.add_argument('-l', '--locale', help='Date translate to desired locale, e.g. -l zh_CN.UTF-8 will shows date in chinese')
     parser.add_argument('-f', '--feed', help='Direct pass full rss feed url. e.g. python blogspot_downloader.py http://www.ulduzsoft.com/feed/ -f http://www.ulduzsoft.com/feed/. Note that it may not able to get previous rss page in non-blogspot site.') #got case not return code, e.g. http://zoczus.blogspot.com/2015/04/plupload-same-origin-method-execution.html , use -a in this case
+    parser.add_argument('-1', '--one', action='store_true', help='Scrape url of ANY webpage as single pdf(-p) or epub')
     parser.add_argument('url', nargs='?', help='Blogspot url') #must add nargs='?' or else always need url but -f shouldn't need
     args, remaining  = parser.parse_known_args() #don't use normal parse_args() which can't ignore above url
     if args.feed:
