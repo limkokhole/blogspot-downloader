@@ -120,6 +120,13 @@ def parse_locale(s):
         clean_up() 
         sys.exit(-1)
 
+def process_url(url):
+    if (url.startswith("'") and url.endswith("'")) or (url.startswith('"') and url.endswith('"')):
+        url = url[1:-1]
+    if not url.startswith(('http://', 'https://')):
+        url = 'https://' + url
+    return url
+
 def process_rss_link(url):
     if '?' not in url:
         url+='?'
@@ -503,16 +510,20 @@ def clean_up():
         print("Remove temp " + epub_dir + "  dir failed -1, please check if it exist and remove manually.")
         sys.exit(-1)
 
+def process_url(url):
+    if (url.startswith("'") and url.endswith("'")) or (url.startswith('"') and url.endswith('"')):
+        url = url[1:-1]
+    if not url.startswith(('http://', 'https://')):
+        url = 'https://' + url
+    return url
+
 def main():
         global epub_dir
         if args.url:
             url = args.url
         else:
             url = input('URL: ').strip()
-        if (url.startswith("'") and url.endswith("'")) or (url.startswith('"') and url.endswith('"')):
-            url = url[1:-1]
-        if not url.startswith(('http://', 'https://')):
-            url = 'https://' + url
+        url = process_url(url)
         #if url.endswith('.html'): #no point do like that for -f and it will need .html for -a, so don't do this
         #    url = "/".join(url.split('/')[:-1])
         parsed_uri = urlparse(url)
@@ -557,11 +568,7 @@ def main():
                             print(ve)
                         reply = input('Paste next <url> OR type \'n\' to exit: ').strip()
                         if (reply and reply[0].lower() != 'n'):
-                            url = reply
-                            if (url.startswith("'") and url.endswith("'")) or (url.startswith('"') and url.endswith('"')):
-                                url = url[1:-1]
-                            if not url.startswith(('http://', 'https://')):
-                                url = 'https://' + url
+                            url = process_url(reply)
                         else:
                             break
             except IOError as ioe:
