@@ -27,8 +27,9 @@ The existing online services either need to paid, has limit of files, need to co
 
     $ python blogspot_downloader.py --help
 
-    usage: blogspot_downloader.py [-h] [-a] [-s] [-d] [-p] [-l LOCALE] [-f FEED]                                                                          
-                                  [url]                                                                                                                   
+    usage: blogspot_downloader.py [-h] [-a] [-s] [-d] [-p] [-l LOCALE] [-f FEED]
+                                  [-1]
+                                  [url]
 
     Blogspot Downloader
 
@@ -38,7 +39,7 @@ The existing online services either need to paid, has limit of files, need to co
     optional arguments:
       -h, --help            show this help message and exit
       -a, --all             Display website mode instead of rss feed mode. Only
-                            support blogspot website but you can try yuor luck in
+                            support blogspot website but you can try your luck in
                             other site too
       -s, --single          Download based on provided url year/month instead of
                             entire blog, will ignored in rss feed mode and
@@ -54,7 +55,7 @@ The existing online services either need to paid, has limit of files, need to co
                             -f http://www.ulduzsoft.com/feed/. Note that it may
                             not able to get previous rss page in non-blogspot
                             site.
-
+      -1, --one             Scrape url of ANY webpage as single pdf(-p) or epub
 
 ## Details:
 
