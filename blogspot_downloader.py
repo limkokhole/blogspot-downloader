@@ -313,7 +313,7 @@ def download(url, h, d_name, ext):
                                 media_content += '<img src="' + tm['url'] + '" >'
                                 #media_content += '<img style="display: block; max-height: 100%; max-width: 100%" src="' + tm['url'] + '" >'
                     #[UPDATE] shouldn't do like that, since thumbnails of feeds normally duplicated with feed without media_content
-                    #... which normally act as profile picture or act as single thumbnail as webpage basic info only.
+                    #... which seems act as single thumbnail on webpage scraping metadata usage only.
                     #... and seems like https://gigaom.com/feed/ thumbnail is not showing in webpage.
                     #elif 'media_thumbnail' in tt: #https://gigaom.com/feed/ only has thumbnail
                     #    for tm in tt['media_thumbnail']:
@@ -331,7 +331,7 @@ def download(url, h, d_name, ext):
                     #h_soup = BeautifulSoup(tt['summary'], "lxml")
                     #for pre in h_soup.find_all('pre'):
                     #    print("pre: ", pre)
-                    #h = h + '<div align="center">' + tt['summary'].replace('<div class="separator"', '<div class="separator" align="center" ') + media_content + "</div>"
+                    #h = h + '<div align="center">' + tt['summary'].replace('<div class="separator"', '<div class="separator" align="center" ') + media_content + "</div>" #no need do replace anymore since the align center should control by global <div>
                     h = h + '<div align="center">' + tt['summary'].replace('<br /><br /><br />', '<br />') + media_content + "</div>"
                     #h = h + '<div align="center">' + tt['summary'] + media_content + "</div>"
                     #h = h + tt['summary'] + media_content
