@@ -97,8 +97,8 @@ ePUB file can edit manually. Simply change name to .zip, unzip it, edit the xhtm
 Also need to add `timeout` or else it stuck forever:
   
     $ grep -n requests\.g /home/xiaobai/.local/lib/python2.7/site-packages/pypub/chapter.py
-    70:            requests_object = requests.get(image_url, headers=request_headers, timeout=11)
-    241:            request_object = requests.get(url, headers=self.request_headers, allow_redirects=False, timeout=11)
+    70:            requests_object = requests.get(image_url, headers=request_headers, timeout=30)
+    241:            request_object = requests.get(url, headers=self.request_headers, allow_redirects=False, timeout=30)
  
 ## Sample Screenshots:
 
