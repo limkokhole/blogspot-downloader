@@ -31,7 +31,7 @@ __email__ = 'limkokhole@gmail.com'
 __status__ = 'Production'
 
 import traceback, shutil, resource
-import sys, os, re, time
+import sys, os, re, time, datetime
 from dateutil import parser as date_parser #need `as` or else conflict name with ArgumentParser
 import unicodedata
 #import pkgutil #I think it should be the responsible of pypub/__init__.py, not this file even it can fix
@@ -562,7 +562,7 @@ def main():
                     print('Create single epub: ' + fpath)
                     while True: 
                         try:
-                            print('Trying url: ' + url)
+                            print('\n[' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Trying url: ' + url)
                             epub_dir = os.path.join( os.getcwd(), tmp_dir )
                             try:
                                 my_chapter = pypub.create_chapter_from_url(url)
@@ -570,13 +570,26 @@ def main():
                                 my_epub.create_epub(os.getcwd())
                             except ValueError as ve: #https://pikachu.com is an invalid url or no network connection
                                 print(ve)
-                            reply = input('Paste next <url> OR type \'n\' to exit: ').strip()
+                            reply = input('\nPaste next <url> OR type \'n\' to exit: ').strip()
                             if (reply and reply[0].lower() != 'n'):
                                 url = process_url(reply)
                             else:
                                 break
                         except IOError as ioe: #should allow next url if requests.get() in pypub's chapter.py timeout
-                            print("IOError but still allow goto next chapter", ioe)
+                            print("\nIOError but still allow goto next chapter", ioe)
+                        except KeyboardInterrupt:
+                            #If you paste all links in once, then this need some time to trigger, but then next url only able to run one url since all the rest url get flush after KeyboardInterrupt, you can just find by url in link page and then copy/paste the remaining urls.
+                            reply = input('\n[' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] [r]etry OR [s]kip to next url OR [q]uit ? [r/s/q] ').strip() #or ctrl+c again also can exit
+                            if reply:
+                                if reply == 's':
+                                    reply = input('\nPaste next <url> OR type \'n\' to exit: ').strip()
+                                    if (reply and reply[0].lower() != 'n'):
+                                        url = process_url(reply)
+                                    else:
+                                        break
+                                elif reply == 'q':
+                                    break
+                                #else #continue/retry
             except IOError as ioe:
                 print("IOError --one: ", ioe)
         elif not args.all:
