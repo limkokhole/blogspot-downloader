@@ -312,10 +312,13 @@ def download(url, h, d_name, ext):
                             if ('medium' in tm) and (tm['medium'] == 'image') and 'url' in tm:
                                 media_content += '<img src="' + tm['url'] + '" >'
                                 #media_content += '<img style="display: block; max-height: 100%; max-width: 100%" src="' + tm['url'] + '" >'
-                    elif 'media_thumbnail' in tt: #https://gigaom.com/feed/ only has thumbnail
-                        for tm in tt['media_thumbnail']:
-                            if 'url' in tm:
-                                media_content += '<img src="' + tm['url'] + '" >'
+                    #[UPDATE] shouldn't do like that, since thumbnails of feeds normally duplicated with feed without media_content
+                    #... which normally act as profile picture or act as single thumbnail as webpage basic info only.
+                    #... and seems like https://gigaom.com/feed/ thumbnail is not showing in webpage.
+                    #elif 'media_thumbnail' in tt: #https://gigaom.com/feed/ only has thumbnail
+                    #    for tm in tt['media_thumbnail']:
+                    #        if 'url' in tm:
+                    #            media_content += '<img src="' + tm['url'] + '" >'
                 except Exception as e:
                     print(e)
                     print('parse media error')
