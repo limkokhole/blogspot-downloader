@@ -558,21 +558,24 @@ def main():
                     my_epub = pypub.Epub(fname[:-5], epub_dir=tmp_dir)
                     print('Create single epub: ' + fpath)
                     while True: 
-                        print('Trying url: ' + url)
-                        epub_dir = os.path.join( os.getcwd(), tmp_dir )
                         try:
-                            my_chapter = pypub.create_chapter_from_url(url)
-                            my_epub.add_chapter(my_chapter)
-                            my_epub.create_epub(os.getcwd())
-                        except ValueError as ve: #https://pikachu.com is an invalid url or no network connection
-                            print(ve)
-                        reply = input('Paste next <url> OR type \'n\' to exit: ').strip()
-                        if (reply and reply[0].lower() != 'n'):
-                            url = process_url(reply)
-                        else:
-                            break
+                            print('Trying url: ' + url)
+                            epub_dir = os.path.join( os.getcwd(), tmp_dir )
+                            try:
+                                my_chapter = pypub.create_chapter_from_url(url)
+                                my_epub.add_chapter(my_chapter)
+                                my_epub.create_epub(os.getcwd())
+                            except ValueError as ve: #https://pikachu.com is an invalid url or no network connection
+                                print(ve)
+                            reply = input('Paste next <url> OR type \'n\' to exit: ').strip()
+                            if (reply and reply[0].lower() != 'n'):
+                                url = process_url(reply)
+                            else:
+                                break
+                        except IOError as ioe: #should allow next url if requests.get() in pypub's chapter.py timeout
+                            print("IOError but still allow goto next chapter", ioe)
             except IOError as ioe:
-                print("IOError", ioe)
+                print("IOError --one: ", ioe)
         elif not args.all:
             print('Download in rss feed mode')
             if args.feed:
