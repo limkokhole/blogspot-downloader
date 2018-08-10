@@ -140,7 +140,7 @@ def process_rss_link(url):
 
 
 def print_rss_err():
-    print('\nSeems like no permission to access rss feed, consider use -a option to scrape in web mode. Or check your url typo OR network. Tips: you may lucky to find feed url by right-click on the webpage and choose "View Page Source", then search for "rss" keyword\n')
+    print('\nSeems like no permission to access rss feed, consider use -a OR -1 option to scrape in web mode. Or check your url typo OR network. Tips: you may lucky to find feed url by right-click on the webpage and choose "View Page Source", then search for "rss" keyword\n')
 
 #prevent image too big and need to scroll
 #only epub, don't put it in pdf, it will causes image not appear
