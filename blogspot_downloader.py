@@ -568,6 +568,7 @@ def main():
                                 my_chapter = pypub.create_chapter_from_url(url)
                                 my_epub.add_chapter(my_chapter)
                                 my_epub.create_epub(os.getcwd())
+                                rm_tmp_files()
                             except ValueError as ve: #https://pikachu.com is an invalid url or no network connection
                                 print(ve)
                             reply = input('\nPaste next <url> OR type \'n\' to exit: ').strip()
