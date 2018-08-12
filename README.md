@@ -94,11 +94,11 @@ ePUB file can edit manually. Simply change name to .zip, unzip it, edit the xhtm
         ...
         'style': ['display', 'padding', 'max-height', 'max-width'],
 
-Also need to add `timeout` or else it stuck forever:
+Also need to add `timeout` or else it stuck forever, and also `allow_redirects=True`:
   
     $ grep -n requests\.g /home/xiaobai/.local/lib/python2.7/site-packages/pypub/chapter.py
-    70:            requests_object = requests.get(image_url, headers=request_headers, timeout=30)
-    241:            request_object = requests.get(url, headers=self.request_headers, allow_redirects=False, timeout=30)
+    70:            requests_object = requests.get(image_url, headers=request_headers, allow_redirects=True, timeout=30)
+    241:            request_object = requests.get(url, headers=self.request_headers, allow_redirects=True, timeout=30)
  
 ## Sample Screenshots:
 

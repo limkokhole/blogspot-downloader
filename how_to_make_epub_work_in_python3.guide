@@ -164,11 +164,11 @@ def get_image_type(url):
         ...
         'style': ['display', 'padding', 'max-height', 'max-width'], 
 
-[21] Set timeout or else it stuck forever:
+[21] Set timeout or else it stuck forever, and also add allow_redirects=True:
 
     $ grep -n requests\.g /home/xiaobai/.local/lib/python3.6/site-packages/pypub/chapter.py
-    70:            requests_object = requests.get(image_url, headers=request_headers)
-    241:            request_object = requests.get(url, headers=self.request_headers, allow_redirects=False)
+    70:            requests_object = requests.get(image_url, headers=request_headers, allow_redirects=True)
+    241:            request_object = requests.get(url, headers=self.request_headers, allow_redirects=True)
 
 
 
