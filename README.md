@@ -99,6 +99,10 @@ Also need to add `timeout` or else it stuck forever, and also `allow_redirects=T
     $ grep -n requests\.g /home/xiaobai/.local/lib/python2.7/site-packages/pypub/chapter.py
     70:            requests_object = requests.get(image_url, headers=request_headers, allow_redirects=True, timeout=30)
     241:            request_object = requests.get(url, headers=self.request_headers, allow_redirects=True, timeout=30)
+
+#### To fix broken qt in python 3 after upgraded Ubuntu (I don't know how to solve in python 2), do:
+    sudo apt --fix-broken install #if below got error
+    sudo apt-get install python3-pyqt5.qtwebengine
  
 ## Sample Screenshots:
 

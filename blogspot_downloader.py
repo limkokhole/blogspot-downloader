@@ -32,6 +32,7 @@ __status__ = 'Production'
 
 import traceback, shutil, resource
 import sys, os, re, time, datetime
+import readline #https://stackoverflow.com/questions/56274748/how-to-navigate-the-text-cursor-in-pythons-input-prompt-with-arrow-keys
 from dateutil import parser as date_parser #need `as` or else conflict name with ArgumentParser
 import unicodedata
 #import pkgutil #I think it should be the responsible of pypub/__init__.py, not this file even it can fix
@@ -643,4 +644,5 @@ if __name__ == "__main__":
             print("Exception -1")
         if args:
             clean_up()
+
 
