@@ -56,6 +56,9 @@ The existing online services either need to paid, has limit of files, need to co
                             not able to get previous rss page in non-blogspot
                             site.
       -1, --one             Scrape url of ANY webpage as single pdf(-p) or epub
+      -lo, --log-link-only  print link only log for -f feed, temporary workaround
+                            to copy into -1, in case -f feed only retrieve
+                            summary.
 
 ## Details:
 

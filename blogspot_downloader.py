@@ -343,12 +343,18 @@ def download(url, h, d_name, ext):
                 title = field[1]
                 title_raw = title.strip()
                 t_url = field[5]
-            print('\ntitle: ' + title_raw)
-            print('link: ' + t_url)
+
+            if not args.log_link_only:
+                print('\ntitle: ' + title_raw)
+                print('link: ' + t_url)
+            else:
+                print(t_url)
+
             if args.pdf:
                 print('Download html as PDF, please be patient...' + str(count) + '/' + str(len(t)))
             else:
-                print('Download html as EPUB, please be patient...' + str(count) + '/' + str(len(t)))
+                if not args.log_link_only:
+                    print('Download html as EPUB, please be patient...' + str(count) + '/' + str(len(t)))
             if args.pdf:
                 if title_is_link: #else just leave slash with empty
                     title = '/'.join(title.split('/')[-3:])
@@ -620,6 +626,7 @@ if __name__ == "__main__":
     parser.add_argument('-l', '--locale', help='Date translate to desired locale, e.g. -l zh_CN.UTF-8 will shows date in chinese')
     parser.add_argument('-f', '--feed', help='Direct pass full rss feed url. e.g. python blogspot_downloader.py http://www.ulduzsoft.com/feed/ -f http://www.ulduzsoft.com/feed/. Note that it may not able to get previous rss page in non-blogspot site.') #got case not return code, e.g. http://zoczus.blogspot.com/2015/04/plupload-same-origin-method-execution.html , use -a in this case
     parser.add_argument('-1', '--one', action='store_true', help='Scrape url of ANY webpage as single pdf(-p) or epub')
+    parser.add_argument('-lo', '--log-link-only', dest='log_link_only', action='store_true', help='print link only log for -f feed, temporary workaround to copy into -1, in case -f feed only retrieve summary.')
     parser.add_argument('url', nargs='?', help='Blogspot url') #must add nargs='?' or else always need url but -f shouldn't need
     args, remaining  = parser.parse_known_args() #don't use normal parse_args() which can't ignore above url
     if args.feed:
