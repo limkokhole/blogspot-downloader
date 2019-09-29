@@ -410,14 +410,16 @@ def download(url, h, d_name, ext):
             else:
                 if not download_once:
                     download_once = True
-                    print("file path: " + fpath)
+                    if not args.log_link_only:
+                        print("file path: " + fpath)
                     if os.path.exists(fname+temp_dir_ext):
                         print(fname+temp_dir_ext + " already exists, please move/backup that direcory to another place manually. Abort")#to not blindly replace file
                         os._exit(1)
                     tmp_dir = fname+temp_dir_ext
                     my_epub = pypub.Epub(fname, epub_dir=tmp_dir)
                     epub_dir = os.path.join( os.getcwd(), tmp_dir )
-                    print("epub_dir: " + epub_dir)
+                    if not args.log_link_only:
+                        print("epub_dir: " + epub_dir)
                 if title_raw:
                     try:
                         title = title.decode('utf-8')
@@ -560,6 +562,8 @@ def main():
                  fpath = os.path.join(os.getcwd(), fname )
             try:
                 if args.pdf:
+                    # [further:0] 'https://thehackernews.com/2019/09/phpmyadmin-csrf-exploit.html' 
+                    # ... nid -1 -p, can't simply -1
                     print('Create single pdf: ' + fpath)
                     pdfkit.from_url(url, fpath)
                 else:
