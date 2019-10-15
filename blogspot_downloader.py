@@ -577,6 +577,11 @@ def main():
                             epub_dir = os.path.join( os.getcwd(), tmp_dir )
                             try:
                                 my_chapter = pypub.create_chapter_from_url(url)
+
+                                # To replace title contains "&"" to "&amp;" , or else will not able open in kchmviewer
+                                # Test case: https://blog.semmle.com/semmle-discovers-severe-vulnerability-ghostscript-postscript-pdf/
+                                my_chapter.title = my_chapter.html_title
+
                                 my_epub.add_chapter(my_chapter)
                                 my_epub.create_epub(os.getcwd())
                                 rm_tmp_files()
