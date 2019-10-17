@@ -587,7 +587,10 @@ def main():
                                 rm_tmp_files()
                             except ValueError as ve: #https://pikachu.com is an invalid url or no network connection
                                 print(ve)
-                            reply = input('\nPaste next <url> OR type \'n\' to exit: ').strip()
+                            try:
+                                reply = input('\nPaste next <url> OR type \'n\' to exit: ').strip()
+                            except EOFError: #when use -1 and < list_of_lines_file, last line will raise EOFError
+                                break
                             if (reply and reply[0].lower() != 'n'):
                                 url = process_url(reply)
                             else:
