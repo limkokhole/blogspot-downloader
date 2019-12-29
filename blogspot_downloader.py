@@ -248,11 +248,13 @@ def download(url, h, d_name, ext):
                 else:
                     url = ''
                     print('no next') 
-            elif ("keys" in dir(r)) and ('link' in r['feed'].keys()):
+            elif ("keys" in dir(r)) and ('links' in r['feed'].keys()):
                 l = r['feed']['links']
+                print(r['feed'])
                 if l:
                     got_next = False
                     for ll in l:
+                        print('hola' + repr(ll))
                         if ll['rel'] == 'next':
                             #if ll['href'] != url: #don't have next link is same case to test
                             url = ll['href']
