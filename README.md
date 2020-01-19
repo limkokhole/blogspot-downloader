@@ -106,13 +106,13 @@ Also need to add `timeout` or else it stuck forever, and also `allow_redirects=T
 #### To fix `</html></html>` malformed html tags, change this create_html_from_fragment() inside pypub/clean.py, from:
 
     try:
-	assert isinstance(tag, bs4.element.Tag)
+        assert isinstance(tag, bs4.element.Tag)
     except AssertionError:
-	raise TypeError
+        raise TypeError
     try:
-	assert tag.find_all('body') == []
+        assert tag.find_all('body') == []
     except AssertionError:
-	raise ValueError
+        raise ValueError
 
     soup = BeautifulSoup('<html><head></head><body></body></html>', 'html.parser')
     soup.body.append(tag)
