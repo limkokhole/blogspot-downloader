@@ -103,7 +103,7 @@ Also need to add `timeout` or else it stuck forever, and also `allow_redirects=T
     70:            requests_object = requests.get(image_url, headers=request_headers, allow_redirects=True, timeout=30)
     241:            request_object = requests.get(url, headers=self.request_headers, allow_redirects=True, timeout=30)
 
-#### To fix "</html></html>" malformed html tags, change this create_html_from_fragment() inside pypub/clean.py, from:
+#### To fix `</html></html>` malformed html tags, change this create_html_from_fragment() inside pypub/clean.py, from:
 
     try:
 	assert isinstance(tag, bs4.element.Tag)
