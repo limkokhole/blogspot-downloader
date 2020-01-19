@@ -102,6 +102,37 @@ Also need to add `timeout` or else it stuck forever, and also `allow_redirects=T
     $ grep -n requests\.g /home/xiaobai/.local/lib/python2.7/site-packages/pypub/chapter.py
     70:            requests_object = requests.get(image_url, headers=request_headers, allow_redirects=True, timeout=30)
     241:            request_object = requests.get(url, headers=self.request_headers, allow_redirects=True, timeout=30)
+
+#### To fix "</html></html>" malformed html tags, change this create_html_from_fragment() inside pypub/clean.py, from:
+
+    try:
+	assert isinstance(tag, bs4.element.Tag)
+    except AssertionError:
+	raise TypeError
+    try:
+	assert tag.find_all('body') == []
+    except AssertionError:
+	raise ValueError
+
+    soup = BeautifulSoup('<html><head></head><body></body></html>', 'html.parser')
+    soup.body.append(tag)
+    return soup
+
+to:
+
+    #try:
+    #    # hole: this is wrong bcoz web browser will auto replace first </html>(if only 2 </html>) with <html>, while <body> still appear.
+    #e.g. http://slae.tehwinsam.com/7/assignment7.html
+    #    assert tag.find_all('body') == []
+    #except AssertionError:
+    #    raise ValueError
+    if tag.find_all('body') == []:
+        soup = BeautifulSoup('<html><head></head><body></body></html>', 'html.parser')
+        soup.body.append(tag)
+    else:
+        soup = BeautifulSoup('<html></html>', 'html.parser')
+        soup.html.append(tag)
+    return soup
  
 ## Sample Screenshots:
 
