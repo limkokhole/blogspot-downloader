@@ -88,10 +88,12 @@ ePUB file can edit manually. Simply change name to .zip, unzip it, edit the xhtm
                 f, temp_file_name = tempfile.mkstemp()
                 ...
 
-#### To fix missing sample code in ePUB, you should add this 2 tags manually in pypub_module_path/pypub/constants.py (Test case: https://security.googleblog.com/2009/03/reducing-xss-by-way-of-automatic.html), and also add "style" tag to make custom image padding 5px (in code) works:
+#### To fix missing sample code in ePUB, you should add this 2 tags manually in pypub_module_path/pypub/constants.py (Test case: https://security.googleblog.com/2009/03/reducing-xss-by-way-of-automatic.html), and also: [1] add "style" tag to make custom image padding 5px (in code) works [2] add 'figure' tag to prevent code tag move to bottom of siblings(Test case: http://slae.tehwinsam.com/3/assignment3.html):
 
     SUPPORTED_TAGS = {
         'code': [],
+        ...
+        'figure': [],
         ...
         'pre': [],
         ...
@@ -118,7 +120,7 @@ Also need to add `timeout` or else it stuck forever, and also `allow_redirects=T
     soup.body.append(tag)
     return soup
 
-to:
+to (Test case: 'http://slae.tehwinsam.com/7/assignment7.html'):
 
     #try:
     #    # hole: this is wrong bcoz web browser will auto replace first </html>(if only 2 </html>) with <html>, while <body> still appear.
@@ -133,7 +135,7 @@ to:
         soup = BeautifulSoup('<html></html>', 'html.parser')
         soup.html.append(tag)
     return soup
- 
+
 ## Sample Screenshots:
 
 download non-blogspot site as rss feed in pdf:  
