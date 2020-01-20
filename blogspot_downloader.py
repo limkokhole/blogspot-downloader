@@ -250,7 +250,7 @@ def download(url, h, d_name, ext):
                     print('no next') 
             elif ("keys" in dir(r)) and ('links' in r['feed'].keys()):
                 l = r['feed']['links']
-                print(r['feed'])
+                #print(r['feed'])
                 if l:
                     got_next = False
                     for ll in l:
@@ -588,6 +588,8 @@ def main():
                                 my_epub.create_epub(os.getcwd())
                                 rm_tmp_files()
                             except ValueError as ve: #https://pikachu.com is an invalid url or no network connection
+                                print('pika')
+                                traceback.print_exc()
                                 print(ve)
                             try:
                                 reply = input('\nPaste next <url> OR type \'n\' to exit: ').strip()
@@ -612,6 +614,8 @@ def main():
                                 elif reply == 'q':
                                     break
                                 #else #continue/retry
+                            #except Exception, ex:
+                            #    print('single global ex: ' + ex)
             except IOError as ioe:
                 print("IOError --one: ", ioe)
         elif not args.all:
