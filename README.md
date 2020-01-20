@@ -136,7 +136,7 @@ to (Test case: 'http://slae.tehwinsam.com/7/assignment7.html'):
         soup.html.append(tag)
     return soup
 
-### To fix UA too old error page and charset encoding issue, please see #23 and #24 in the file how_to_make_epub_work_in_python3.guide.
+#### To fix UA too old error page and charset encoding issue, please see #23 and #24 in the file how_to_make_epub_work_in_python3.guide.
 
 ## Sample Screenshots:
 
