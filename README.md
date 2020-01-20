@@ -70,7 +70,7 @@ Not all blogs works in -p pdf mode, you will quickly noticed this if you found d
 
 This script designate in Linux and never test in Windows. This script also not designate run in multi process since it will remove /tmp trash file.
 
-To make pypub works in python 3, read how_to_make_epub_work_in_python3.guide to change it manually yourself, or simply fork the module from https://github.com/limkokhole/pypub .
+To make pypub works in python 3, read how_to_make_epub_work_in_python3.guide to change it manually yourself, or simply fork the module from https://github.com/limkokhole/pypub . I recommend using python 3 since I noticed python 2 has issue when parsing table tags.
 
 Duplicated filename will not replace but suffix with current timestamp.
 
@@ -80,7 +80,7 @@ ePUB file can edit manually. Simply change name to .zip, unzip it, edit the xhtm
 
     def get_image_type(url):
         url = url.lower() #[1] add this
-        for ending in ['jpg', 'jpeg', '.gif', '.png', '.bmp']: #[2] add comma between .gif and .png #[3] Add .bmp
+        for ending in ['.jpg', '.jpeg', '.gif', '.png', '.bmp']: #[2] add comma between .gif and .png #[3] Add .bmp #[4] Add prefix '.'
              if url.endswith(ending)  or ((ending + '?') in url): #[4] add (ending + '?') checking or else not showing image end with ? which may contains inner html img src, and then imghdr will not recognize it but ePUB editor and web browser able to render it.
                 return ending
         else:
@@ -135,6 +135,8 @@ to (Test case: 'http://slae.tehwinsam.com/7/assignment7.html'):
         soup = BeautifulSoup('<html></html>', 'html.parser')
         soup.html.append(tag)
     return soup
+
+To fix UA too old error page and encoding issue, please see #23 and #24 in the file how_to_make_epub_work_in_python3.guide:
 
 ## Sample Screenshots:
 

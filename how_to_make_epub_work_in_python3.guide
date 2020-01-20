@@ -164,7 +164,11 @@ def get_image_type(url):
         ...
         'pre': [],
         ...
-        'style': ['display', 'padding', 'max-height', 'max-width'], 
+        'style': ['display', 'padding', 'max-height', 'max-width'],
+        ...
+	'table': ['width', 'cellspacing', 'cellpadding', 'border',  'align'], #hole
+	'td': ['width', 'height', 'bgcolor'], #hole
+	'tr': ['width', 'height', 'bgcolor'], #hole 
 
 [21] Set timeout or else it stuck forever, and also add allow_redirects=True:
 
@@ -203,5 +207,77 @@ to:
         soup.html.append(tag)
     return soup
 
+[23] To fix web browser too old error page, edit pypub/chapter.py, increase Firefox version from 31 to newer number, i.e. 1000000 in my example:
+
+    def __init__(self, clean_function=clean.clean):
+        self.clean_function = clean_function
+        #UA causes too old web browser page, e.g. https://huanlan.zhihu.com/p/12345
+        user_agent = r'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/1000000.0'
+        self.request_headers = {'User-Agent': user_agent}
+
+[24] To fix charset encoding issues, e.g. gb2312 charset defined in meta tags not showing properly, just edit pypub/chapter.py:
+
+#Add this global functions:
+
+import re
+def hole_meta_encoding(soup):
+    if soup and soup.meta:
+        encod = soup.meta.get('charset')
+        if encod == None:
+            encod = soup.meta.get('content-type')
+            if encod == None:
+                content = soup.meta.get('content')
+                match = re.search('charset=(.*)', content)
+                if match:
+                    encod = match.group(1)
+                else:
+                    return None #raise ValueError('unable to find encoding')
+        return encod
+
+Change:
+	unicode_string = request_object.text
+	return self.create_chapter_from_string(unicode_string, url, title)
+to:
+	#unicode_string = request_object.text
+	return self.create_chapter_from_string(None, url, title, request_object=request_object)
+
+Replace `create_chapter_from_string` function code with (Don't change the part after title_node = root.titl, which included unicode() in python 2):
+
+    def create_chapter_from_string(self, html_string, url=None, title=None, request_object=None):
+        """
+        # Same description
+        """
+        if request_object:
+            request_object.encoding = 'utf-8'
+            html_string = request_object.text
+        elif not html_string: #if 404, request_object will None
+            html_string = '<html></html>'
+        clean_html_string = self.clean_function(html_string)
+        clean_xhtml_string = clean.html_to_xhtml(clean_html_string)
+        if title:
+            pass
+        else:
+            try:
+                if request_object:
+                    root = BeautifulSoup(html_string, 'html.parser')
+                    meta_encoding = hole_meta_encoding(root)
+                    if meta_encoding and (meta_encoding.lower() != 'utf-8'):
+                        #print('Encoding to meta encoding: ' + repr(meta_encoding))
+                        request_object.encoding = meta_encoding
+                        html_string = request_object.text
+                        root = BeautifulSoup(html_string, 'html.parser')
+                        clean_html_string = self.clean_function(html_string)
+                        clean_xhtml_string = clean.html_to_xhtml(clean_html_string)
+                else:
+                    root = BeautifulSoup(html_string, 'html.parser')
+                title_node = root.title
+                if title_node is not None:
+                    #title = unicode(title_node.string)
+                    title = title_node.string
+                else:
+                    raise ValueError
+            except (IndexError, ValueError):
+                title = 'Ebook Chapter'
+        return Chapter(clean_xhtml_string, title, url)
 
 
