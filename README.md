@@ -88,7 +88,7 @@ ePUB file can edit manually. Simply change name to .zip, unzip it, edit the xhtm
                 f, temp_file_name = tempfile.mkstemp()
                 ...
 
-#### To fix missing sample code in ePUB, you should add this 2 tags manually in pypub_module_path/pypub/constants.py (Test case: https://security.googleblog.com/2009/03/reducing-xss-by-way-of-automatic.html), and also: [1] add "style" tag to make custom image padding 5px (in code) works [2] add 'figure' tag to prevent code tag move to bottom of siblings(Test case: http://slae.tehwinsam.com/3/assignment3.html):
+#### To fix missing sample code in ePUB, you should add this tags manually in pypub_module_path/pypub/constants.py (Test case: https://security.googleblog.com/2009/03/reducing-xss-by-way-of-automatic.html), and also: [1] add "style" tag to make custom image padding 5px (in code) works [2] add 'figure' tag to prevent code tag move to bottom of siblings(Test case: http://slae.tehwinsam.com/3/assignment3.html):
 
     SUPPORTED_TAGS = {
         'code': [],
@@ -102,6 +102,10 @@ ePUB file can edit manually. Simply change name to .zip, unzip it, edit the xhtm
         'samp': [], #https://www.crummy.com/software/BeautifulSoup/bs3/documentation.html#Parsing%20HTML 
         ...
         'style': ['display', 'padding', 'max-height', 'max-width'],
+        ...
+ 	'table': ['width', 'cellspacing', 'cellpadding', 'border',  'align'],
+	'td': ['width', 'height', 'bgcolor'],
+	'tr': ['width', 'height', 'bgcolor'],
 
 Also need to add `timeout` or else it stuck forever, and also `allow_redirects=True`:
   
