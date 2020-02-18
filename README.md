@@ -103,9 +103,9 @@ ePUB file can edit manually. Simply change name to .zip, unzip it, edit the xhtm
         ...
         'style': ['display', 'padding', 'max-height', 'max-width'],
         ...
- 	'table': ['width', 'cellspacing', 'cellpadding', 'border',  'align'],
-	'td': ['width', 'height', 'bgcolor'],
-	'tr': ['width', 'height', 'bgcolor'],
+        'table': ['width', 'cellspacing', 'cellpadding', 'border',  'align'],
+        'td': ['width', 'height', 'bgcolor'],
+        'tr': ['width', 'height', 'bgcolor'],
 
 Also need to add `timeout` or else it stuck forever, and also `allow_redirects=True`:
   
