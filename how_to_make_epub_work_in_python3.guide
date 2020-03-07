@@ -252,7 +252,10 @@ Replace `create_chapter_from_string` function code with (Don't change the part a
         # Same description
         """
         if request_object:
-            request_object.encoding = 'utf-8'
+            # Test case: https://new.qq.com/omn/20180816/20180816A0A0D0.html which return headers "content-type: text/html; charset=GB2312"
+            # ... shouldn't make it utf-8
+            if not request_object.encoding: # just in case, default depends on header content-type(alternative to html meta)
+                request_object.encoding = 'utf-8'
             html_string = request_object.text
         elif not html_string: #if 404, request_object will None
             html_string = '<html></html>'
