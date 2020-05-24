@@ -39,7 +39,8 @@ import unicodedata
 #sys.path.append(os.path.dirname(pkgutil.get_loader("pypub").get_filename()))
 import feedparser #for rss feed mode
 import pdfkit #for pdf #also need `sudo apt install wkhtmltopdf`
-if sys.version_info[0] >= 3:
+PY3 = sys.version_info[0] >= 3
+if PY3:
     from urllib.request import urlopen
     from urllib.error import HTTPError
     from urllib.parse import urlparse
@@ -47,6 +48,7 @@ if sys.version_info[0] >= 3:
     def unicode(mystr): #python3
         return mystr
     import html
+    from bs4 import BeautifulSoup, SoupStrainer #python3 #python2 also got, and python need use this or else error when `soup = BeautifulSoup(r, "lxml")` 
 else:
     from urllib2 import urlopen, HTTPError
     import urllib2
@@ -54,14 +56,13 @@ else:
     input = raw_input
     from HTMLParser import HTMLParser
     html_parser = HTMLParser() #again, don't conflict name with other vars "parser"
-try: from bs4 import BeautifulSoup, SoupStrainer #python3 #python2 also got, and python need use this or else error when `soup = BeautifulSoup(r, "lxml")` 
-except ImportError: from BeautifulSoup import BeautifulSoup, SoupStrainer #python2
+    from BeautifulSoup import BeautifulSoup, SoupStrainer #python2
 #import weasyprint #incomplete, so don't use
 import argparse
 parser = argparse.ArgumentParser(description='Blogspot Downloader')
 args = ""
 def slugify(value):
-    if sys.version_info[0] >= 3:
+    if PY3:
         value = unicodedata.normalize('NFKD', value)
     #value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
     #value = unicode(re.sub('[^\w\s-]', ' ', value, re.UNICODE).strip())
@@ -77,14 +78,14 @@ def setlocale(*args, **kw):
   yield locale.setlocale(*args, **kw)
   locale.setlocale(locale.LC_ALL, saved)
 
-if sys.version_info[0] >= 3:
+if PY3:
     r1 = '’'; r2 = "“"; r3 = "”"; r4 = '—'; r5 = '–'; r6 = '…'; r7 = '®'
 else:
     r1 = '’'.decode('utf-8'); r2 = "“".decode('utf-8'); r3 = "”".decode('utf-8'); r4 = '—'.decode('utf-8'); r5 = '–'.decode('utf-8'); r6 = '…'.decode('utf-8'); r7 = '®'.decode('utf-8')
 import cgi #cgi.escape
 def replacer(s):
     s = s.replace('\\x26', "&")
-    if sys.version_info[0] >= 3:
+    if PY3:
         s = html.unescape(s)
     else:
         s = html_parser.unescape(s)
@@ -181,13 +182,14 @@ def download(url, h, d_name, ext):
                 print('\nNote that -a -s only allow if url has /year/[month] format, pls check your url\n')
                 clean_up()
                 os._exit(1)
-            if sys.version_info[0] >= 3:
+            if PY3:
                 r = r.decode('utf-8')
             t = r.split("'title'")
             t = t[1:]
         else:
             url = process_rss_link(url)
-            print("Scraping rss feed... " + url)
+            if not args.log_link_only:
+                print("Scraping rss feed... " + url)
             r = feedparser.parse(url) #, request_headers={'User-Agent': UA, 'Referer': url}) #I noticed https://blog.mozilla.org/security/feed/1 (/1 non exist) is working in feedparser, lolr
             #print(r.headers)
             t = r['entries']
@@ -199,7 +201,7 @@ def download(url, h, d_name, ext):
                 try:
                     print("Try to scrape rss feed url automatically ... " + orig_url)
                     ##r = urlopen(orig_url).read() #https://medium.com/bugbountywriteup got check UA if urllib2 UA then not authorized
-                    if sys.version_info[0] >= 3:
+                    if PY3:
                         req = urllib.request.Request(orig_url, data=None, headers={ 'User-Agent': UA })
                         r = urllib.request.urlopen(req).read()
                     else:
@@ -254,7 +256,7 @@ def download(url, h, d_name, ext):
                 if l:
                     got_next = False
                     for ll in l:
-                        print('hola' + repr(ll))
+                        #print('hola' + repr(ll))
                         if ll['rel'] == 'next':
                             #if ll['href'] != url: #don't have next link is same case to test
                             url = ll['href']
@@ -281,7 +283,7 @@ def download(url, h, d_name, ext):
                 t_date = ''
                 try:
                     if args.locale:
-                        if sys.version_info[0] >= 3:
+                        if PY3:
                             t_date = parse_locale(post_date)
                         else:
                             t_date = parse_locale(post_date).decode('utf-8')
@@ -360,7 +362,7 @@ def download(url, h, d_name, ext):
             if args.pdf:
                 if title_is_link: #else just leave slash with empty
                     title = '/'.join(title.split('/')[-3:])
-                if sys.version_info[0] >= 3:
+                if PY3:
                     fname = os.path.join( d_name, slugify(unicode(title)) )
                 else:
                     print(title)
@@ -470,7 +472,7 @@ def download(url, h, d_name, ext):
 def scrape(url, d_name, ext):
     try:
         #r = urlopen(url).read()
-        if sys.version_info[0] >= 3:
+        if PY3:
             req = urllib.request.Request(url, data=None, headers={ 'User-Agent': UA })
             r = urllib.request.urlopen(req).read()
         else:
@@ -633,7 +635,7 @@ def main():
             scrape(url, d_name, ext)
         print("\nDone")
 
-if sys.version_info[0] < 3:
+if not PY3:
     sys.exc_clear() #do not produce eception of import part.
 if __name__ == "__main__":
     parser.add_argument('-a', '--all', action='store_true', help='Display website mode instead of rss feed mode. Only support blogspot website but you can try your luck in other site too')
@@ -660,7 +662,7 @@ if __name__ == "__main__":
             clean_up()
     finally: #https://stackoverflow.com/questions/4606942/why-cant-i-handle-a-keyboardinterrupt-in-python
         #traceback.print_exc() #finally doesn't always means exception, it will run even in normal flow, so no need clean_up in other place
-        if sys.version_info[0] >= 3: #temp workaround to suppress none
+        if PY3: #temp workaround to suppress none
             f = open(os.devnull, 'w') #don't print anthing for traceback.print_exc
             sys.stdout = f
         if traceback.format_exc() != 'None\n':
