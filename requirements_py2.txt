@@ -1,4 +1,0 @@
-beautifulsoup
-pdfkit
-feedparser
-argparse
