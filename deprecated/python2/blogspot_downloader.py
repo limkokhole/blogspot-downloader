@@ -82,9 +82,7 @@ if PY3:
     r1 = '’'; r2 = "“"; r3 = "”"; r4 = '—'; r5 = '–'; r6 = '…'; r7 = '®'
 else:
     r1 = '’'.decode('utf-8'); r2 = "“".decode('utf-8'); r3 = "”".decode('utf-8'); r4 = '—'.decode('utf-8'); r5 = '–'.decode('utf-8'); r6 = '…'.decode('utf-8'); r7 = '®'.decode('utf-8')
-
-#import html #cgi.escape deprecated since py 3.2 , https://docs.python.org/3/whatsnew/3.8.html#api-and-feature-removals
-
+import cgi #cgi.escape
 def replacer(s):
     s = s.replace('\\x26', "&")
     if PY3:
@@ -582,34 +580,6 @@ def main():
                             print('\n[' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '] Trying url: ' + url)
                             epub_dir = os.path.join( os.getcwd(), tmp_dir )
                             try:
-
-                                '''
-                                import trace
-                                #print("sys path: ", sys.prefix, sys.exec_prefix)
-                                tracer = trace.Trace(
-                                    trace=1,
-                                    #ignoredirs=[sys.prefix, sys.exec_prefix] )
-                                    ignoredirs=[ '/usr/lib/python3/',  '/usr/lib/python3.6/', '/usr/lib/python3.8/',
-                                    '/home/xiaobai/.local/lib/python3.6/site-packages/lxml/', 
-                                     ],
-                                    ignoremods=[ 'version', 'pyparsing', 'six', '_tokenizer', 'serialize', 'exceptions', 'request'
-                                    , '_inputstream', 'etree', 'html5parser', '_structures', 'specifier', 'specifiers', 'serializer'
-                                    , '_utils', '_compat'
-                                    , '_htmlparser', 'element', 'dammit', 'universaldetector', 'codingstatemachine', 'utf8prober'
-                                    , 'enums', 'mbcsgroupprober', 'charsetgroupprober', 'charsetprober', 'latin1prober'
-                                    , 'charsetgroupprober', 'sbcharsetprober', 'hebrewprober', 'euctwprober', 'mbcharsetprober'
-                                    , 'chardistribution', 'sbcsgroupprober', 'jpcntx', 'sjisprober', 'big5prober', 'cp949prober'
-                                    , 'euckrprober', 'gb2312prober', 'eucjpprober', 'timeout', 'pyopenssl', 'SSL', 'poolmanager'
-                                    , 'connectionpool', 'response', '_collections', 'core', 'intranges', 'binding', '_oid', 'x509'
-                                    , 'decode_asn1', 'utils', 'extensions', 'general_name', 'cookies', 'models', 'structures'
-                                    , '_internal_utils', 'sessions', 'adapters', 'hooks', 'retry'
-                                    , 'connection', 'api', 'url', 'ssl_'
-                                    , 'wait', 'crypto', '_util', 'backend', 'makefile'
-                                    ]
-                                    #count=1)
-                                )
-                                '''
-                                #my_chapter = tracer.runfunc(pypub.create_chapter_from_url, url)
                                 my_chapter = pypub.create_chapter_from_url(url)
 
                                 # To replace title contains "&"" to "&amp;" , or else will not able open in kchmviewer
