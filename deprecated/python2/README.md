@@ -158,19 +158,19 @@ download blogspot site as rss feed in pdf without file limits:
 
 download blogspot site as web scraping in ePUB which able to include comments section:
 
-![eat]((/images/eat.png?raw=true "download blogspot site as web scraping in ePUB")
+![eat](/images/eat.png?raw=true "download blogspot site as web scraping in ePUB")
 
 download blogspot site as rss feed in ePUB, plus custom locale date in Chinese:  
 
-![locale]((/images/locale.png?raw=true "download blogspot site as rss feed in ePUB, plus custom locale")
+![locale](/images/locale.png?raw=true "download blogspot site as rss feed in ePUB, plus custom locale")
 
 pdf keep color, while ePUB don't:  
 
-![color]((/images/color.png?raw=true "pdf keep color, while ePUB don't")
+![color](/images/color.png?raw=true "pdf keep color, while ePUB don't")
 
 With --one option, you can paste any webpage link manually to make custom ebook chapter :D (Tip: You can download this extension https://addons.mozilla.org/en-US/firefox/addon/link-gopher to get all the link then copy/paste all in once(No need to paste one by one) into prompt, and don't forget last link need to press Enter. You can also use `< urls.txt` style.)
 
-![color]((/images/perl.png?raw=true "You can even paste any webpage link to create a nice ePUB ebook :D")
+![color](/images/perl.png?raw=true "You can even paste any webpage link to create a nice ePUB ebook :D")
 
 ## Demonstration video (Click image to play at YouTube): ##
 [![watch in youtube](https://i.ytimg.com/vi/B6QzTmMglEo/hqdefault.jpg)](https://www.youtube.com/watch?v=B6QzTmMglEo "Blogspot_downloader")
