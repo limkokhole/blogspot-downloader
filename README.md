@@ -58,9 +58,9 @@ The existing online services either need to paid, has limit of files, need to co
 
 ## Normal usage:
 
-    python3 blogspot_downloader.py [blogspot url] # Download blogspot as Feed
+    python3 blogspot_downloader.py [blogspot url] # Download blogspot as RSS Feed
 
-    python3 blogspot_downloader.py -1
+    python3 blogspot_downloader.py -1 # Any website link, or full(non-RSS) blogspot page
     python3 blogspot_downloader.py -1 [url]
 
     python3 blogspot_downloader.py -lo [blogspot url] # To get list of blogspot urls which can save to /tmp/urls.list manually
