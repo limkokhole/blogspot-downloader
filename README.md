@@ -13,7 +13,9 @@ The existing online services either need to paid, has limit of files, need to co
 
     pip3 install -r requirements_py3.txt #python 3
 
-    In ubuntu, run `sudo apt install wkhtmltopdf`
+    In ubuntu, run `sudo apt install wkhtmltopdf`.
+    
+    pypub/ contains my miscellaneous bug fixes and customization from original pypub, and tested in python 3.8.5
 
 ## How to run (Only support python3):
 
