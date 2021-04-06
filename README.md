@@ -56,6 +56,16 @@ The existing online services either need to paid, has limit of files, need to co
                             to copy into -1, in case -f feed only retrieve
                             summary.
 
+## Normal usage:
+
+    python3 blogspot_downloader.py [blogspot url] # Download blogspot as Feed
+
+    python3 blogspot_downloader.py -1
+    python3 blogspot_downloader.py -1 [url]
+
+    python3 blogspot_downloader.py -lo [blogspot url] # To get list of blogspot urls which can save to /tmp/urls.list manually
+    python3 blogspot_downloader.py -1 </tmp/urls.list # Download above urls list. Currently you still need manually delete above output file.
+    
 ## Details:
 
 It will asked the blogspot url if you don't pass [url] in command option.
