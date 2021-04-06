@@ -76,8 +76,6 @@ Not all blogs works in -p pdf mode, you will quickly noticed this if you found d
 
 This script designate in Linux and never test in Windows. This script also not designate run in multi process since it will remove /tmp trash file.
 
-To make pypub works in python 3, read how_to_make_epub_work_in_python3.guide to change it manually yourself, or simply fork the module from https://github.com/limkokhole/pypub . I recommend using python 3 since I noticed python 2 has issue when parsing table tags.
-
 Duplicated filename will not replace but suffix with current timestamp.
 
 ePUB file can edit manually. Simply change name to .zip, unzip it, edit the xhtml, and (inside epub directory) do `zip -rX ../<epub direcory name>.epub minetype.txt META-INF/ OEBPS/` to repack it easily.  I recommend Kchmviewer viewer and Sigli, but if it doesn't open since it may too strict in xhtml syntax, then you can try other viewer in this case (Sigli will try auto fix for you), and please don't feel hesitate to issue a ticket.
