@@ -9,13 +9,17 @@ Not only blogspot, if any webpage contains rss feed, especially for wordpress, t
 The existing online services either need to paid, has limit of files, need to copy per-page manually, only support rss feed, or only support epub. This python script is free, no files limit as it run in your local machine/ip, download all pages/feed automatically, support both rss and web scraping(some blog rss is private or only one page), support both epub and pdf. It also support custom locale date. The most important thing: this is simple python code and you can feel free to modify it, e.g. custom html color, extra html header/footer, default directory ... etc :)
 
 ## How to setup (Only support python3):
+
+<pre>
     git clone https://github.com/limkokhole/blogspot-downloader.git
+    cd blogspot-downloader/
 
     pip3 install -r requirements_py3.txt #python 3
 
     In ubuntu, run `sudo apt install wkhtmltopdf`.
     
-    pypub/ contains my miscellaneous bug fixes and customization from original pypub, and tested in python 3.8.5
+    pypub/ contains my miscellaneous bug fixes and customization from original <a href="https://github.com/wcember/pypub">Pypub</a>, and tested in python 3.8.5
+</pre>
 
 ## How to run (Only support python3):
 
