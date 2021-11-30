@@ -240,6 +240,11 @@ class Chapter(object):
             if node.has_attr('data-original'):
                 raw_image_urls.append(node['data-original'])
                 image_nodes_filtered.append(node)
+            elif node.has_attr('data-url'): 
+                # [todo:0] option to select this in cmd?
+                # Test case: https://www.webtoons.com/zh-hant/drama/hellbound/%E5%BA%8F%E7%AB%A0/viewer?title_no=2771&episode_no=1&utm_source=titlepitch&utm_medium=2021_nov
+                raw_image_urls.append(node['data-url'])
+                image_nodes_filtered.append(node)
             elif node.has_attr('src'):
                 raw_image_urls.append(node['src'])
                 image_nodes_filtered.append(node)

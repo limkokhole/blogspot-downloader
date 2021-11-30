@@ -28,8 +28,8 @@ SUPPORTED_TAGS = {
     'hr /': ['color', 'id', 'width'],
     'html': [],
     'i': ['class', 'id'],
-    'img': ['align', 'border', 'height', 'id', 'src', 'width', 'data-original'],
-    'img /': ['align', 'border', 'height', 'id', 'src', 'width', 'data-original'],
+    'img': ['align', 'border', 'height', 'id', 'src', 'width', 'data-original', 'data-url'],
+    'img /': ['align', 'border', 'height', 'id', 'src', 'width', 'data-original', 'data-url'],
     'kbd': [], #hole, https://www.crummy.com/software/BeautifulSoup/bs3/documentation.html#Parsing%20HTML 
     'li': ['class', 'id', 'title'],
     'main': ['class'],
