@@ -108,7 +108,7 @@ pdf keep color, while ePUB don't:
 
 ![color](/images/color.png?raw=true "pdf keep color, while ePUB don't")
 
-With --one option, you can paste any webpage link manually to make custom ebook chapter :D (Tip: You can download this extension https://addons.mozilla.org/en-US/firefox/addon/link-gopher to get all the link then copy/paste all in once(No need to paste one by one) into prompt, and don't forget last link need to press Enter. You can also use `< urls.txt` style.)
+With --one option, you can paste any webpage link manually to make custom ebook chapter :D (Tip: You can download this extension https://addons.mozilla.org/en-US/firefox/addon/link-gopher to get all the link then copy/paste all in once(No need to paste one by one) into prompt, and don't forget last link need to press Enter. You can also use `< urls.txt` style.). -1 only support single pdf when -p.
 
 ![color](/images/perl.png?raw=true "You can even paste any webpage link to create a nice ePUB ebook :D")
 
