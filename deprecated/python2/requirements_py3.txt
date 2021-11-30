@@ -1,0 +1,5 @@
+pdfkit
+bs4
+feedparser
+argparse
+
