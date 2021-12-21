@@ -8,6 +8,7 @@ import http
 import urllib
 #import urlparse
 from urllib.parse import urlparse
+from urllib.parse import quote
 import uuid
 import bs4
 from bs4 import BeautifulSoup
@@ -79,6 +80,10 @@ def get_image_type(url):
             f, temp_file_name = tempfile.mkstemp()
             socket.setdefaulttimeout(60)
             try:
+                parsed_link = urllib.parse.urlsplit(url)
+                # Test case 'https://product.pconline.com.cn/itbk/software/dnyw/1703/8956578.html' which contains unicode in img src 'https://acount.pconline.com.cn/wzcount/artbrowse.php?groupname=电脑网&subgroupname=&id=8956578&title=&response=1'
+                parsed_link = parsed_link._replace(path=quote(parsed_link.path), query=quote(parsed_link.query))
+                url = parsed_link.geturl()
                 urllib.request.urlretrieve(url, temp_file_name)
             except http.client.InvalidURL:
                 # Remove newline in url.
