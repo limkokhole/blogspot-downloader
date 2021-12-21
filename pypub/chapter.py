@@ -275,17 +275,23 @@ import re
 def hole_meta_encoding(soup):
     if soup and soup.meta:
         encod = soup.meta.get('charset')
-        if encod == None:
+        if not encod:
             encod = soup.meta.get('content-type')
-            if encod == None:
-                content = soup.meta.get('content')
-                if not content: # Test case: 'https://www.ebay.com/itm/373703108841'
-                    return
+            if not encod:
+                content = ''
+                for meta in soup.findAll('meta', attrs={'http-equiv': lambda x: x and x.lower() == 'content-type'}):
+                    content = meta['content']
+                    if content:
+                        break # Test case: https://zhidao.baidu.com/question/3561395.html
+                if not content:
+                    content = soup.meta.get('content')
+                if not content:
+                    return # Test case: 'https://www.ebay.com/itm/373703108841'
                 match = re.search('charset=(.*)', content)
                 if match:
                     encod = match.group(1)
                 else:
-                    return None #raise ValueError('unable to find encoding')
+                    return #raise ValueError('unable to find encoding')
         return encod
 
 
