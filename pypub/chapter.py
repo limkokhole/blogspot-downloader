@@ -12,6 +12,7 @@ import uuid
 import bs4
 from bs4 import BeautifulSoup
 from bs4.dammit import EntitySubstitution
+import socket
 import requests
 
 import clean
@@ -76,6 +77,7 @@ def get_image_type(url):
     else:
         try:
             f, temp_file_name = tempfile.mkstemp()
+            socket.setdefaulttimeout(60)
             try:
                 urllib.request.urlretrieve(url, temp_file_name)
             except http.client.InvalidURL:
@@ -277,6 +279,8 @@ def hole_meta_encoding(soup):
             encod = soup.meta.get('content-type')
             if encod == None:
                 content = soup.meta.get('content')
+                if not content: # Test case: 'https://www.ebay.com/itm/373703108841'
+                    return
                 match = re.search('charset=(.*)', content)
                 if match:
                     encod = match.group(1)
@@ -300,7 +304,7 @@ class ChapterFactory(object):
     def __init__(self, clean_function=clean.clean):
         self.clean_function = clean_function
         #UA causes too old web browser page, e.g. https://huanlan.zhihu.com/p/12345
-        user_agent = r'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/1000000.0'
+        user_agent = r'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
         self.request_headers = {'User-Agent': user_agent}
 
     def create_chapter_from_url(self, url, title=None):
@@ -384,7 +388,7 @@ class ChapterFactory(object):
             #with mock.patch.object(requests.cookies.RequestsCookieJar, 'update', lambda *args, **kwargs: 0):
             #with mock.patch.object(requests.cookies.RequestsCookieJar, 'update', update):
             #request_object = tracer.runfunc(s.get, url)
-            request_object = s.get(url)
+            request_object = s.get(url, timeout=300)
 
             #print(request_object.cookies)
             #print(request_object.text)
