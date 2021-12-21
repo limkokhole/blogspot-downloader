@@ -285,8 +285,8 @@ def hole_meta_encoding(soup):
                         break # Test case: https://zhidao.baidu.com/question/3561395.html
                 if not content:
                     content = soup.meta.get('content')
-                if not content:
-                    return # Test case: 'https://www.ebay.com/itm/373703108841'
+                    if not content:
+                        return # Test case: 'https://www.ebay.com/itm/373703108841'
                 match = re.search('charset=(.*)', content)
                 if match:
                     encod = match.group(1)
