@@ -97,29 +97,54 @@ def save_image(img_url, image_directory, image_name, s):
         ImageErrorException: Raised if unable to save the image at image_url
     """
 
-    #image_url = 'https://www.face book.com/tr?id=469667556766095&ev=我pageview\n&noscript=1'
-    #image_url = 'https://www.facebook.com/tr?id=46966755676   !#T%A<>M"6095^&ev=pageview\n&noscript=1'
-    #image_url = ' https://acount.pconline.com.cn/wzcount/artbrowse.php?groupname=电脑网&subgroupname=&id=8956578&title=&response=1 '
-    #image_url = 'https://www.facebook.com/tr?groupname=&id=46966755676   #%A<>M"我>M"6095^&ev=pageview&noscript=1' # fragment no unicode error, only query!
-    #image_url = '   https://user:pass物品@www.faceboo@k.com/tr?groupname=物品&id=%26555966755676   ##%A<>M"我>M"6095^&ev=page!view&nos:crip=3&u/t=1&?love=3!$&'+ "'" + '"/(hello)*+,;=sc  '
-    #image_url = '   https://www.facebook.com/tr?groupname=物品&id=%26555966755676   ##%A<>M"我>M"6095^&ev=page!view&nos:crip=3&u/t=1&?love=3!$&'+ "'" + '"/(hello)*+,;=sc  '
+    #test_url = 'https://www.face book.com/tr?id=469667556766095&ev=我pageview\n&noscript=1'
+    #test_url = 'https://www.facebook.com/tr?id=46966755676   !#T%A<>M"6095^&ev=pageview\n&noscript=1'
+    #test_url = ' https://acount.pconline.com.cn/wzcount/artbrowse.php?groupname=电脑网&subgroupname=&id=8956578&title=&response=1 '
+    #test_url = 'https://www.facebook.com/tr?groupname=&id=46966755676   #%A<>M"我>M"6095^&ev=pageview&noscript=1' # fragment no unicode error, only query!
+    #test_url = '   https://user:pass物品@www.faceboo@k.com/tr?groupname=物品&id=%26555966755676   ##%A<>M"我>M"6095^&ev=page!view&nos:crip=3&u/t=1&?love=3!$&'+ "'" + '"/(hello)*+,;=sc  '
+    #test_url = '   https://www.facebook.com/tr?groupname=物品&id=%26555966755676   ##%A<>M"我>M"6095^&ev=page!view&nos:crip=3&u/t=1&?love=3!$&'+ "'" + '"/(hello)*+,;=sc  '
+    #test_url = 'http://user:pass@127.0.0.1:8066/asas'
+    #test_url2 = 'http://127.0.0.1:8066/asas'
+    #img_url = 'http://user:p我a@ss@127.0.0.1:8066/asas'
+    #import random
+    #img_url = random.choice( [img_url, test_url] ) # testing purpose
+    #img_url = random.choice( [test_url, test_url2] ) # testing purpose
+    #print('choice is: ' + repr(img_url))
+
     img_url = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', img_url).strip() # Must assign to img_url since exception need this too
 
     url_subbed_s = img_url
     if contains_disallowed_url_pchar_re.search(img_url):
         url_subbed_s = contains_disallowed_url_pchar_re.sub( my_replace , img_url) # Actually only space get replaced
 
+    auth_b = False
     try:
         url_subbed_s.encode('ascii')
+
+        parsed_link = urllib.parse.urlsplit(img_url)
+        if '@' in parsed_link.netloc:
+            userpass_domain = parsed_link.netloc.split('@')
+            userpass = '@'.join(userpass_domain[:-1])
+            if ':' in userpass:
+                s.auth = tuple(userpass.split(':'))
+                auth_b = True
+            netloc = userpass_domain[-1] # remove user:pass@ after extract
+            parsed_link = parsed_link._replace(netloc=netloc)
+            url_subbed_s = parsed_link.geturl()
+            print('url: '+ url_subbed_s)
+
     except (UnicodeEncodeError):
         #except (http.client.InvalidURL, UnicodeEncodeError):
         parsed_link = urllib.parse.urlsplit(img_url)
-        # Support deprecated basic auth overkill, unless migrate to requests may consider
-        #, code here for reference only since http.client.InvalidURL will throws
         if '@' in parsed_link.netloc:
             userpass_domain = parsed_link.netloc.split('@')
-            # safe=':' not included '@' which follows Chrome behavior if multiple '@'
-            netloc = '@'.join([quote( '@'.join(userpass_domain[:-1]), safe=':' ), userpass_domain[-1].encode('idna').decode('utf-8')])
+            # safe=':' not included '@' which follows Chrome behavior if multiple '@' 
+            # unicode encoded as %E6%88%91 too, concerns: https://stackoverflow.com/a/3470930/1074998
+            userpass = quote( '@'.join(userpass_domain[:-1]) , safe=':')
+            if ':' in userpass:
+                s.auth = tuple(userpass.split(':'))
+                auth_b = True
+            netloc = userpass_domain[-1].encode('idna').decode('utf-8')
             parsed_link = parsed_link._replace(netloc=netloc)
         # Test case 'https://product.pconline.com.cn/itbk/software/dnyw/1703/8956578.html' which contains unicode in img src 'https://acount.pconline.com.cn/wzcount/artbrowse.php?groupname=电脑网&subgroupname=&id=8956578&title=&response=1'
         # Can't (as someone said) use page encoding instead of utf-8 for query/fragment
@@ -129,13 +154,18 @@ def save_image(img_url, image_directory, image_name, s):
         # No need ontains_disallowed_url_pchar_re.sub again since only space get replace which already encoded.
         #print(url_subbed_s)
 
+    if not auth_b:
+        s.auth = None
+
     image_type = get_image_type(url_subbed_s)
-    #if image_type is None: # No need raise
-    #    raise ImageErrorException(image_url)
-    full_image_file_name = os.path.join(image_directory, image_name + '.' + image_type)
+    if image_type is None: # No need raise
+        f, temp_file_name = tempfile.mkstemp()
+        #raise ImageErrorException(image_url)
+    else:
+        temp_file_name = os.path.join(image_directory, image_name + '.' + image_type)
     try:
-        # urllib.urlretrieve(image_url, full_image_file_name)
-        with open(full_image_file_name, 'wb') as f:
+        f_move = False
+        with open(temp_file_name, 'wb') as f:
             user_agent = r'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
             #try:
             #    # test case: 'https://www.raychase.net/1418' 's 'https://www.raychase.net/wp-content/uploads/2019/10/极客时间.png'
@@ -144,6 +174,7 @@ def save_image(img_url, image_directory, image_name, s):
             #    img_url_h = image_url.encode('utf-8')
             #except UnicodeEncodeError:
             #    img_url_h = image_url
+            #print(url_subbed_s)
             request_headers = {'User-Agent': user_agent, 'Referer': url_subbed_s} #hole
             requests_object = s.get(url_subbed_s, headers=request_headers, allow_redirects=True, timeout=30)
             try:
@@ -151,10 +182,14 @@ def save_image(img_url, image_directory, image_name, s):
                 # Check for empty response
                 f.write(content)
                 if not image_type:
-                    image_type = imghdr.what(full_image_file_name)
-                    print('img type: ' + repr(image_type) )
+                    image_type = imghdr.what(temp_file_name)
+                    #print('img type: ' + repr(image_type) )
+                    f_move = True
             except AttributeError:
                 raise ImageErrorException(url_subbed_s)
+        if f_move:
+            #print('img: ' + repr(temp_file_name) + ' move to ' + repr(os.path.join(image_directory, image_name + '.' + image_type)) )
+            shutil.move(temp_file_name, os.path.join(image_directory, image_name + '.' + image_type) )
     except IOError:
         raise ImageErrorException(url_subbed_s)
     return image_type
