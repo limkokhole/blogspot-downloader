@@ -131,7 +131,7 @@ def save_image(img_url, image_directory, image_name, s):
             netloc = userpass_domain[-1] # remove user:pass@ after extract
             parsed_link = parsed_link._replace(netloc=netloc)
             url_subbed_s = parsed_link.geturl()
-            print('url: '+ url_subbed_s)
+            #print('url: '+ url_subbed_s)
 
     except (UnicodeEncodeError):
         #except (http.client.InvalidURL, UnicodeEncodeError):
