@@ -1,7 +1,7 @@
 import html #cgi.escape deprecated since py 3.2 , https://docs.python.org/3/whatsnew/3.8.html#api-and-feature-removals
 import codecs
 import imghdr
-import os
+import os, re
 import shutil
 import tempfile
 import http
@@ -9,6 +9,7 @@ import urllib
 #import urlparse
 from urllib.parse import urlparse
 from urllib.parse import quote
+contains_disallowed_url_pchar_re = re.compile('[\x00-\x20\x7f]')
 import uuid
 import bs4
 from bs4 import BeautifulSoup
@@ -75,69 +76,91 @@ def get_image_type(url):
     for ending in ['.jpg', '.jpeg', '.gif', '.png', '.bmp']:
         if url.endswith(ending) or ((ending + '?') in url):
             return ending
-    else:
-        try:
-            f, temp_file_name = tempfile.mkstemp()
-            socket.setdefaulttimeout(60)
-            try:
-                parsed_link = urllib.parse.urlsplit(url)
-                # Test case 'https://product.pconline.com.cn/itbk/software/dnyw/1703/8956578.html' which contains unicode in img src 'https://acount.pconline.com.cn/wzcount/artbrowse.php?groupname=电脑网&subgroupname=&id=8956578&title=&response=1'
-                parsed_link = parsed_link._replace(path=quote(parsed_link.path), query=quote(parsed_link.query))
-                url = parsed_link.geturl()
-                urllib.request.urlretrieve(url, temp_file_name)
-            except http.client.InvalidURL:
-                # Remove newline in url.
-                # Test case: https://www.chinapress.com.my/20210406/%e5%a4%9f%e5%8a%9b%e6%9c%89%e9%92%b1%ef%bc%81-%e5%ae%b6%e8%97%8f350%e4%b8%87%e7%8e%b0%e9%87%91-%e5%9d%90%e6%8b%a5%e6%b8%b8%e8%89%87%e3%80%81%e7%9b%b4%e5%8d%87%e6%9c%ba/ -> contains 'https://www.facebook.com/tr?id=469667556766095&ev=pageview\n&noscript=1' (repr(url))
-                # https://stackoverflow.com/a/39416125/1074998
-                urllib.request.urlretrieve(re.sub(r'[\x00-\x1f\x7f-\x9f]', '', url), temp_file_name)
-            image_type = imghdr.what(temp_file_name)
-            return image_type
-        except IOError:
-            return None
+    # return None will check later after downloaded
 
 
-def save_image(image_url, image_directory, image_name):
+def my_replace(match):
+    return quote( match.group(0) )
+
+
+def save_image(img_url, image_directory, image_name, s):
     """
     Saves an online image from image_url to image_directory with the name image_name.
     Returns the extension of the image saved, which is determined dynamically.
 
     Args:
-        image_url (str): The url of the image.
+        img_url (str): The url of the image.
         image_directory (str): The directory to save the image in.
         image_name (str): The file name to save the image as.
 
     Raises:
         ImageErrorException: Raised if unable to save the image at image_url
     """
-    image_type = get_image_type(image_url)
-    if image_type is None:
-        raise ImageErrorException(image_url)
+
+    #image_url = 'https://www.face book.com/tr?id=469667556766095&ev=我pageview\n&noscript=1'
+    #image_url = 'https://www.facebook.com/tr?id=46966755676   !#T%A<>M"6095^&ev=pageview\n&noscript=1'
+    #image_url = ' https://acount.pconline.com.cn/wzcount/artbrowse.php?groupname=电脑网&subgroupname=&id=8956578&title=&response=1 '
+    #image_url = 'https://www.facebook.com/tr?groupname=&id=46966755676   #%A<>M"我>M"6095^&ev=pageview&noscript=1' # fragment no unicode error, only query!
+    #image_url = '   https://user:pass物品@www.faceboo@k.com/tr?groupname=物品&id=%26555966755676   ##%A<>M"我>M"6095^&ev=page!view&nos:crip=3&u/t=1&?love=3!$&'+ "'" + '"/(hello)*+,;=sc  '
+    #image_url = '   https://www.facebook.com/tr?groupname=物品&id=%26555966755676   ##%A<>M"我>M"6095^&ev=page!view&nos:crip=3&u/t=1&?love=3!$&'+ "'" + '"/(hello)*+,;=sc  '
+    img_url = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', img_url).strip() # Must assign to img_url since exception need this too
+
+    url_subbed_s = img_url
+    if contains_disallowed_url_pchar_re.search(img_url):
+        url_subbed_s = contains_disallowed_url_pchar_re.sub( my_replace , img_url) # Actually only space get replaced
+
+    try:
+        url_subbed_s.encode('ascii')
+    except (UnicodeEncodeError):
+        #except (http.client.InvalidURL, UnicodeEncodeError):
+        parsed_link = urllib.parse.urlsplit(img_url)
+        # Support deprecated basic auth overkill, unless migrate to requests may consider
+        #, code here for reference only since http.client.InvalidURL will throws
+        if '@' in parsed_link.netloc:
+            userpass_domain = parsed_link.netloc.split('@')
+            # safe=':' not included '@' which follows Chrome behavior if multiple '@'
+            netloc = '@'.join([quote( '@'.join(userpass_domain[:-1]), safe=':' ), userpass_domain[-1].encode('idna').decode('utf-8')])
+            parsed_link = parsed_link._replace(netloc=netloc)
+        # Test case 'https://product.pconline.com.cn/itbk/software/dnyw/1703/8956578.html' which contains unicode in img src 'https://acount.pconline.com.cn/wzcount/artbrowse.php?groupname=电脑网&subgroupname=&id=8956578&title=&response=1'
+        # Can't (as someone said) use page encoding instead of utf-8 for query/fragment
+        # ... since not able to pass byte-like to requests, must choose 1 encoding
+        parsed_link = parsed_link._replace(path=quote(parsed_link.path, safe='=&%/:^!?$\'(),*;'), query=quote(parsed_link.query, safe='=&%#/:^!?$+\'(),*;'), fragment=quote(parsed_link.fragment, safe='=&%#/:^!?$+\'(),*;'))
+        url_subbed_s = parsed_link.geturl()
+        # No need ontains_disallowed_url_pchar_re.sub again since only space get replace which already encoded.
+        #print(url_subbed_s)
+
+    image_type = get_image_type(url_subbed_s)
+    #if image_type is None: # No need raise
+    #    raise ImageErrorException(image_url)
     full_image_file_name = os.path.join(image_directory, image_name + '.' + image_type)
     try:
         # urllib.urlretrieve(image_url, full_image_file_name)
         with open(full_image_file_name, 'wb') as f:
-            user_agent = r'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0'
-            try:
-                # test case: 'https://www.raychase.net/1418' 's 'https://www.raychase.net/wp-content/uploads/2019/10/极客时间.png'
-                # unicode header need encode first or else throws "UnicodeEncodeError: 'latin-1' codec" error in python3.6/http/client.py
-                # rf: https://stackoverflow.com/questions/6289474/
-                img_url_h = image_url.encode('utf-8')
-            except UnicodeEncodeError:
-                img_url_h = image_url
-            request_headers = {'User-Agent': user_agent, 'Referer': img_url_h} #hole
-            requests_object = requests.get(image_url, headers=request_headers, allow_redirects=True, timeout=30)
+            user_agent = r'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
+            #try:
+            #    # test case: 'https://www.raychase.net/1418' 's 'https://www.raychase.net/wp-content/uploads/2019/10/极客时间.png'
+            #    # unicode header need encode first or else throws "UnicodeEncodeError: 'latin-1' codec" error in python3.6/http/client.py
+            #    # rf: https://stackoverflow.com/questions/6289474/
+            #    img_url_h = image_url.encode('utf-8')
+            #except UnicodeEncodeError:
+            #    img_url_h = image_url
+            request_headers = {'User-Agent': user_agent, 'Referer': url_subbed_s} #hole
+            requests_object = s.get(url_subbed_s, headers=request_headers, allow_redirects=True, timeout=30)
             try:
                 content = requests_object.content
                 # Check for empty response
                 f.write(content)
+                if not image_type:
+                    image_type = imghdr.what(full_image_file_name)
+                    print('img type: ' + repr(image_type) )
             except AttributeError:
-                raise ImageErrorException(image_url)
+                raise ImageErrorException(url_subbed_s)
     except IOError:
-        raise ImageErrorException(image_url)
+        raise ImageErrorException(url_subbed_s)
     return image_type
 
 
-def _replace_image(image_url, image_tag, ebook_folder,
+def _replace_image(image_url, image_tag, ebook_folder, s, 
                    image_name=None):
     """
     Replaces the src of an image to link to the local copy in the images folder of the ebook. Tightly coupled with bs4
@@ -160,7 +183,7 @@ def _replace_image(image_url, image_tag, ebook_folder,
         image_full_path = os.path.join(ebook_folder, 'images')
         assert os.path.exists(image_full_path)
         image_extension = save_image(image_url, image_full_path,
-                                     image_name)
+                                     image_name, s)
         image_tag['src'] = 'images' + '/' + image_name + '.' + image_extension
     except ImageErrorException:
         image_tag.decompose()
@@ -267,8 +290,9 @@ class Chapter(object):
 
     def _replace_images_in_chapter(self, ebook_folder):
         image_url_list = self._get_image_urls()
+        s = requests.Session()
         for image_tag, image_url in image_url_list:
-            _replace_image(image_url, image_tag, ebook_folder)
+            _replace_image(image_url, image_tag, ebook_folder, s)
         unformatted_html_unicode_string = self._content_tree.prettify(encoding='utf-8', formatter='html')
         #unformatted_html_unicode_string = unicode(self._content_tree.prettify(encoding='utf-8',
         #                                                                      formatter=EntitySubstitution.substitute_html),
