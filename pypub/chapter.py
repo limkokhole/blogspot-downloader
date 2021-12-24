@@ -14,9 +14,9 @@ import uuid
 import bs4
 from bs4 import BeautifulSoup
 from bs4.dammit import EntitySubstitution
-import socket
+#import socket
 import requests
-
+import ssl
 import clean
 
 # hole
@@ -176,7 +176,14 @@ def save_image(img_url, image_directory, image_name, s):
             #    img_url_h = image_url
             #print(url_subbed_s)
             request_headers = {'User-Agent': user_agent, 'Referer': url_subbed_s} #hole
-            requests_object = s.get(url_subbed_s, headers=request_headers, allow_redirects=True, timeout=30)
+
+            try:
+                requests_object = s.get(url_subbed_s, headers=request_headers, allow_redirects=True, timeout=30)
+            except requests.exceptions.SSLError:
+                # Test case http://blog.sina.com.cn/s/blog_9f00ed7f0102w6hj.html's image https://www.delfinoverde.com/images/2014-05/06/xin_5605110604589242312612.jpg both throws
+                s.mount('https://', TLSAdapter())
+                requests_object = s.get(url_subbed_s, headers=request_headers, allow_redirects=True, timeout=30)
+
             try:
                 content = requests_object.content
                 # Check for empty response
@@ -359,6 +366,15 @@ def hole_meta_encoding(soup):
         return encod
 
 
+class TLSAdapter(requests.adapters.HTTPAdapter):
+    # Credit: https://stackoverflow.com/a/69580908/1074998
+    def init_poolmanager(self, *args, **kwargs):
+        ctx = ssl.create_default_context()
+        ctx.set_ciphers('DEFAULT@SECLEVEL=1') # See `man ciphers`
+        #print(ctx.get_ciphers())
+        kwargs['ssl_context'] = ctx
+        return super(TLSAdapter, self).init_poolmanager(*args, **kwargs)
+
 
 class ChapterFactory(object):
     """
@@ -428,7 +444,7 @@ class ChapterFactory(object):
             #print(dir(s))
             #print(s.cookies)
 
-            import trace
+            #import trace
             #print("sys path: ", sys.prefix, sys.exec_prefix)
             '''
             tracer = trace.Trace(
@@ -458,7 +474,12 @@ class ChapterFactory(object):
             #with mock.patch.object(requests.cookies.RequestsCookieJar, 'update', lambda *args, **kwargs: 0):
             #with mock.patch.object(requests.cookies.RequestsCookieJar, 'update', update):
             #request_object = tracer.runfunc(s.get, url)
-            request_object = s.get(url, timeout=300)
+            try:
+                request_object = s.get(url, timeout=300)
+            except requests.exceptions.SSLError:
+                # Test case: http://blog.sina.com.cn/s/blog_9f00ed7f0102w6hj.html
+                s.mount('https://', TLSAdapter())
+                request_object = s.get(url, timeout=300)
 
             #print(request_object.cookies)
             #print(request_object.text)
