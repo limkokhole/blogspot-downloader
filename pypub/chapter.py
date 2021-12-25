@@ -180,7 +180,7 @@ def save_image(img_url, image_directory, image_name, s):
             try:
                 requests_object = s.get(url_subbed_s, headers=request_headers, allow_redirects=True, timeout=30)
             except requests.exceptions.SSLError:
-                # Test case http://blog.sina.com.cn/s/blog_9f00ed7f0102w6hj.html's image https://www.delfinoverde.com/images/2014-05/06/xin_5605110604589242312612.jpg both throws
+                # Test case https://www.delfinoverde.com/opinion/2014-05/06/content_503129.htm's image https://www.delfinoverde.com/images/2014-05/06/xin_5605110604589242312612.jpg both throws
                 s.mount('https://', TLSAdapter())
                 requests_object = s.get(url_subbed_s, headers=request_headers, allow_redirects=True, timeout=30)
 
@@ -477,7 +477,7 @@ class ChapterFactory(object):
             try:
                 request_object = s.get(url, timeout=300)
             except requests.exceptions.SSLError:
-                # Test case: http://blog.sina.com.cn/s/blog_9f00ed7f0102w6hj.html
+                # Test case: https://www.delfinoverde.com/opinion/2014-05/06/content_503129.htm
                 s.mount('https://', TLSAdapter())
                 request_object = s.get(url, timeout=300)
 
