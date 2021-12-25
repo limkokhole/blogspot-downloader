@@ -19,6 +19,8 @@ import requests
 import ssl
 import clean
 
+from concurrent.futures import ThreadPoolExecutor
+
 # hole
 #import sys
 #import logging
@@ -333,8 +335,10 @@ class Chapter(object):
     def _replace_images_in_chapter(self, ebook_folder):
         image_url_list = self._get_image_urls()
         s = requests.Session()
-        for image_tag, image_url in image_url_list:
-            _replace_image(image_url, image_tag, ebook_folder, s)
+
+        with ThreadPoolExecutor() as executor:
+            futures = {executor.submit(_replace_image, image_url, image_tag, ebook_folder, s) for image_tag, image_url in image_url_list}
+
         unformatted_html_unicode_string = self._content_tree.prettify(encoding='utf-8', formatter='html')
         #unformatted_html_unicode_string = unicode(self._content_tree.prettify(encoding='utf-8',
         #                                                                      formatter=EntitySubstitution.substitute_html),
