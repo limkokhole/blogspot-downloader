@@ -185,7 +185,6 @@ def save_image(img_url, image_directory, image_name, s):
                 # Test case https://www.delfinoverde.com/opinion/2014-05/06/content_503129.htm's image https://www.delfinoverde.com/images/2014-05/06/xin_5605110604589242312612.jpg both throws
                 s.mount('https://', TLSAdapter())
                 requests_object = s.get(url_subbed_s, headers=request_headers, allow_redirects=True, timeout=30)
-
             try:
                 content = requests_object.content
                 # Check for empty response
@@ -546,7 +545,8 @@ class ChapterFactory(object):
                 # test case(ISO-8859-1): http://castic.xiaoxiaotong.org/2019/studentDetails.html?77061
                 try:
                     html_string = request_object.text.encode(request_object.encoding).decode('utf-8')
-                except UnicodeDecodeError:
+                except (UnicodeEncodeError, UnicodeDecodeError):
+                    # test case(UnicodeEncodeError): https://new.qq.com/omn/20191011/20191011A0Q9JI00.html
                     # test case: https://www.dawuxia.net/forum.php?mod=viewthread&tid=1034211
                     html_string = request_object.text
         elif not html_string: #if 404, request_object will None
