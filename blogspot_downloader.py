@@ -571,7 +571,8 @@ def main():
                     # [further:0] 'https://thehackernews.com/2019/09/phpmyadmin-csrf-exploit.html' 
                     # ... nid -1 -p, can't simply -1
                     print('Create single pdf: ' + fpath)
-                    pdfkit.from_url(url, fpath)
+                    # test case(need default 3 seconds): https://www.quora.com/Why-does-the-loopback-interface-on-my-computer-has-65536-as-the-MTU-while-other-interfaces-has-1500-as-the-MTU
+                    pdfkit.from_url(url, fpath, options={'--javascript-delay': args.js_delay*1000})
                 else:
                     import_pypub()
                     tmp_dir = d_name+temp_dir_ext
@@ -672,6 +673,7 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--single', action='store_true', help='Download based on provided url year/month instead of entire blog, will ignored in rss feed mode and --print_date')
     parser.add_argument('-d', '--print_date', action='store_true', help='Print main date info without execute anything')
     parser.add_argument('-p', '--pdf', action='store_true', help='Output in PDF instead of EPUB but might failed in some layout')
+    parser.add_argument('--js-delay', dest='js_delay', type=int, default=3, help='Specify delay seconds for -1 -p to have enough time for Javascript to load. Default is 3 seconds.')
     parser.add_argument('-l', '--locale', help='Date translate to desired locale, e.g. -l zh_CN.UTF-8 will shows date in chinese')
     parser.add_argument('-f', '--feed', help='Direct pass full rss feed url. e.g. python blogspot_downloader.py http://www.ulduzsoft.com/feed/ -f http://www.ulduzsoft.com/feed/. Note that it may not able to get previous rss page in non-blogspot site.') #got case not return code, e.g. http://zoczus.blogspot.com/2015/04/plupload-same-origin-method-execution.html , use -a in this case
     parser.add_argument('-1', '--one', action='store_true', help='Scrape url of ANY webpage as single pdf(-p) or epub')

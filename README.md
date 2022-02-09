@@ -49,6 +49,8 @@ pypub/ directory contains my miscellaneous bug fixes and customization from orig
       -d, --print_date      Print main date info without execute anything
       -p, --pdf             Output in PDF instead of EPUB but might failed in some
                             layout
+      --js-delay JS_DELAY   Specify delay seconds for -1 -p to have enough time
+                            for Javascript to load. Default is 3 seconds.
       -l LOCALE, --locale LOCALE
                             Date translate to desired locale, e.g. -l zh_CN.UTF-8
                             will shows date in chinese
