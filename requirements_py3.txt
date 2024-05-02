@@ -2,4 +2,7 @@ pdfkit
 bs4
 feedparser
 argparse
-
+python-dateutil
+jinja2
+requests
+lxml
