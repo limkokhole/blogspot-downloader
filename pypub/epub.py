@@ -1,5 +1,12 @@
 import collections
-import imp
+
+import sys
+if sys.version_info[0] < 3:
+    # In Python 2, site.py strips sys.setdefaultencoding on startup to protect ASCII coercion.
+    # reload(sys) restores it to enforce global UTF-8 decoding. Obsolete in Python 3.
+    reload(sys)  # Since only < 3, so no need try `from importlib import reload` then except `import imp; reload = imp.reload`
+    sys.setdefaultencoding('utf-8')
+
 import random
 import string
 import shutil
@@ -10,9 +17,8 @@ import requests
 import requests.packages.urllib3
 
 try:
-    imp.find_module('lxml')
     lxml_module_exists = True
-    import lxml.etree
+    import lxml.etree # No need find_spec or find_module, this will throw if not exist
     import lxml.html
     import lxml.html.builder
 except ImportError:
@@ -22,13 +28,12 @@ import chapter
 
 requests.packages.urllib3.disable_warnings()
 
-class _Minetype(object):
+class _Mimetype(object):
 
     def __init__(self, parent_directory):
-        minetype_template = os.path.join(EPUB_TEMPLATES_DIR, 'minetype.txt')
-        shutil.copy(minetype_template,
-                    os.path.join(parent_directory, 'minetype.txt'))
-
+        mimetype_template = os.path.join(EPUB_TEMPLATES_DIR, 'mimetype')
+        shutil.copy(mimetype_template,
+                    os.path.join(parent_directory, 'mimetype'))
 
 class _ContainerFile(object):
 
@@ -190,7 +195,7 @@ class Epub(object):
         self.toc_html = TocHtml()
         self.toc_ncx = TocNcx()
         self.opf = ContentOpf(self.title, self.creator, self.language, self.rights, self.publisher, self.uid)
-        self.minetype = _Minetype(self.EPUB_DIR)
+        self.mimetype = _Mimetype(self.EPUB_DIR)
         self.container = _ContainerFile(self.META_INF_DIR)
 
     def _create_directories(self, epub_dir=None):
@@ -264,6 +269,29 @@ class Epub(object):
                 pass
             shutil.make_archive(epub_name_with_path, 'zip', self.EPUB_DIR)
             return epub_name_with_path + '.zip'
+
+        def create_zip_archive(epub_name):
+            import zipfile
+            if epub_name is None:
+                epub_name = self.title
+            epub_name = ''.join([c for c in epub_name if c.isalpha() or c.isdigit() or c == ' ']).rstrip()
+            epub_name_with_path = os.path.join(output_directory, epub_name)
+            zip_path = epub_name_with_path + '.zip'
+            try:
+                os.remove(zip_path)
+            except OSError:
+                pass
+            
+            with zipfile.ZipFile(zip_path, 'w') as zout:
+                mimetype_path = os.path.join(self.EPUB_DIR, 'mimetype')
+                zout.write(mimetype_path, 'mimetype', compress_type=zipfile.ZIP_STORED)
+                for root, dirs, files in os.walk(self.EPUB_DIR):
+                    for file in files:
+                        if file == 'mimetype':
+                            continue
+                        f_path = os.path.join(root, file)
+                        zout.write(f_path, os.path.relpath(f_path, self.EPUB_DIR), compress_type=zipfile.ZIP_DEFLATED)
+            return zip_path
 
         def turn_zip_into_epub(zip_archive):
             epub_full_name = zip_archive.strip('.zip') + '.epub'

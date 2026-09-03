@@ -150,8 +150,8 @@ def condense(input_string):
         assert isinstance(input_string, basestring)
     except AssertionError:
         raise TypeError
-    removed_leading_whitespace = re.sub('>\s+', '>', input_string).strip()
-    removed_trailing_whitespace = re.sub('\s+<', '<', removed_leading_whitespace).strip()
+    removed_leading_whitespace = re.sub(r'>\s+', '>', input_string).strip() # r to escape the \s characters
+    removed_trailing_whitespace = re.sub(r'\s+<', '<', removed_leading_whitespace).strip()
     return removed_trailing_whitespace
 
 

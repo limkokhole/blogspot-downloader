@@ -67,9 +67,9 @@ def slugify(value):
     #value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
     #value = unicode(re.sub('[^\w\s-]', ' ', value, re.UNICODE).strip())
     if args.pdf:
-        value = unicode(re.sub('[-/\s]+', ' ', value, re.UNICODE))
+        value = unicode(re.sub(r'[-/\s]+', ' ', value, re.UNICODE)) # r to escape the \s characters and eliminate the SyntaxWarning.
     else: #pypub always replace dot, so to make duplicated file checking works, need to replace here before feed pypub.
-        value = unicode(re.sub('[-_./\s]+', ' ', value, re.UNICODE))
+        value = unicode(re.sub(r'[-_./\s]+', ' ', value, re.UNICODE))
     return value
 import locale, contextlib
 @contextlib.contextmanager

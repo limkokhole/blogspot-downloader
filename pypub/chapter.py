@@ -263,6 +263,12 @@ class Chapter(object):
         self.content = content
         self._content_tree = BeautifulSoup(self.content, 'html.parser')
         #print(self._content_tree) #pretty already
+
+        if not self._content_tree.head:
+            self._content_tree.html.insert(0, self._content_tree.new_tag('head'))
+        meta = self._content_tree.new_tag('meta', charset='utf-8')
+        self._content_tree.head.insert(0, meta)
+        
         self.url = url
         self.html_title = html.escape(self.title, quote=True)
 
